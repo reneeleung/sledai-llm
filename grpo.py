@@ -778,7 +778,7 @@ if __name__ == "__main__":
     parser.add_argument("--grpo_base_model", default="qwen3_8b", choices=list(MODELS.keys()))
     parser.add_argument("--test", action="store_true")
     parser.add_argument("--test_full", action="store_true")
-    parser.add_argument("--test_folder", type=str, default="sample658") # sample658, mimiciv-sledai
+    parser.add_argument("--test_folder", type=str, default="sample658") # sample658, sledai-notes
     parser.add_argument("--sample_filter", type=str) # sample to include (e.g. sample242)
     parser.add_argument("--ckpt", type=int, default=2000)
     parser.add_argument("--base", action="store_true")

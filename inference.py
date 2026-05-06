@@ -21,7 +21,7 @@ def load_sle_data(files):
     for file in files:
         for descrip in descriptors:
             print(file, descrip)
-            prompt = build_prompt(source_dir, file, descrip, prompt_builder, False, args.v2_prompt)
+            prompt = build_prompt(source_dir, file, descrip, prompt_builder, args.v2_prompt)
             # truncate prompt
             prompt = prompt[:max_seq_length]
             datapoint = {

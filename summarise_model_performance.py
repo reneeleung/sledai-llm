@@ -29,9 +29,9 @@ priority_names = ['total', 'type_b', 'type_a<8', 'type_a=8', 'weight=4', 'weight
 # prefix = 'sample658'
 # ratio = 1.0
 
-prefix = 'mimiciv-sledai'
+prefix = 'sledai-notes'
 ratio = None # if no_train_test_split
-v2_prompt = True
+v2_prompt = False
 
 grouped = False
 n_runs = 5

@@ -4,7 +4,7 @@ import sys
 
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.insert(0, parent_dir)
-from utils import descriptors, sledai_weights
+from prompts.prompt import descriptors, sledai_weights
 
 undercase = lambda s: s[:1].lower() + s[1:] if s[1].lower() == s[1] else s
 uppercase = lambda s: s[0].upper() + s[1:]
@@ -25,9 +25,9 @@ def main():
     #data_dir = 'sample658/'
     #benchmark_name = 'sample658_entities_gold.csv'
     #benchmark_scores_name = 'sample658_scores_gold.csv'
-    data_dir = 'mimiciv-sledai/'
-    benchmark_name = 'mimiciv-sledai_entities_gold.csv'
-    benchmark_scores_name = 'mimiciv-sledai_scores_gold.csv'
+    data_dir = 'sledai-notes/'
+    benchmark_name = 'sledai-notes_entities_gold.csv'
+    benchmark_scores_name = 'sledai-notes_scores_gold.csv'
 
     ann_files = [file for file in os.listdir(data_dir) if file.endswith('.ann')]
     annotations = []

@@ -2,21 +2,21 @@
 Automated SLEDAI-2K scoring from clinical notes using large language models (LLMs).
 
 ## Dataset
-Our study includes an SLE internal dataset and an external validation set derived from MIMIC-IV. The internal dataset cannot be shared publicly due to patient privacy safeguards. The annotated MIMIC-IV SLE subset is available through [PhysioNet](https://physionet.org/xxx).
+Our study includes hospital clinical notes, synthetic cases derived from published case reports, and MIMIC-IV discharge notes. The hospital data cannot be shared publicly due to patient privacy safeguards. However, the synthetic cases are available on [Zenodo](https://doi.org/10.5281/zenodo.20042444).
 
 ## Getting started
-1. Access the data
-- Download the annotated MIMIC data via Physionet.
-- Place the folder under `data/`.
+1. Install dependencies
+```
+pip install -r requirements.txt
+```
+
+2. Access the data
+- Download the annotated data via Zenodo.
+- Place the notes (.txt) and the annotations (.ann) in a folder under `data/`, (e.g. `data/sledai-notes/`).
 - Create annotated csv files.
 ```
 cd data/
 python brat_to_csv.py
-```
-
-2. Install dependencies
-```
-pip install -r requirements.txt
 ```
 
 3. Run inference
@@ -25,9 +25,9 @@ In `recipes.py`, you may set the number of GPUs required to run the LLM. For exa
 
 The following script runs inference on the full set. To only run on the test set, remove `--test_full`.
 
-Note: We use prompt V2 for the MIMIC data to assess SLEDAI scores at the time of admission (instead of the date of a clinical note).
+Note: If your data contains discharge notes (such as MIMIC-IV), use prompt V2 to assess SLEDAI scores at the time of admission (instead of the date of the clinical note).
 ```
-python grpo.py --grpo_base_model gptoss_120b --test --base --test_full --test_folder mimiciv-sledai --no_train_test_split --v2_prompt --n_run 1
+python grpo.py --grpo_base_model gptoss_120b --test --base --test_full --test_folder sledai-notes --no_train_test_split --n_run 1
 ```
 
 For grouped descriptors prompt, run the following (note v2_prompt is not supported in grouped descriptors prompt):
@@ -39,9 +39,9 @@ Note: If you are running inference across different machines, make sure to use t
 
 4. Second-layer verifier
 
-To following runs the second-layer verifier based on outputs of the first layer.
+To following runs the second-layer verifier based on outputs of the first layer. Similary, use v2_prompt if data contains discharge notes.
 ```
-python grpo_verifier.py --model_to_check gptoss_120b --test_full --test_folder mimiciv-sledai --v2_prompt --n_run 1
+python grpo_verifier.py --model_to_check gptoss_120b --test_full --test_folder sledai-notes --n_run 1
 ``` 
 
 5. Summarize results

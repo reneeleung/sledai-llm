@@ -1,5 +1,5 @@
 data/sample658
-data/mimiciv-sledai
+data/sledai-notes
 data/*.csv
 **/**/__pycache__/
 save/
