@@ -50,6 +50,12 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="config-option">
+                        <button id="editTemplateBtn" class="btn-text" style="width: 100%; text-align: center; padding: 8px; margin-top: 8px;">
+                            ✏️ Edit Prompt Templates (General Guidelines)
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -204,6 +210,108 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Template Editor Modal -->
+    <div id="templateModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeTemplateModal()"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>✏️ Edit Prompt Templates</h3>
+                <button class="modal-close" onclick="closeTemplateModal()">&times;</button>
+            </div>
+            <div class="modal-tabs">
+                <button class="modal-tab active" data-template-type="outpatient">📄 Outpatient Template</button>
+                <button class="modal-tab" data-template-type="discharge">🏥 Discharge Template</button>
+            </div>
+            
+            <div class="modal-body">
+                <div class="placeholder-legend">
+                    <span>💡 Click on any <code class="placeholder-highlight">{{ placeholder }}</code> in the template below to edit its content:</span>
+                    <ul class="legend-list">
+                        <li><code>{{ treatment_logic }}</code> → <strong>Treatment Response</strong> (for low-score descriptors, score &lt; 8) <strong>OR</strong> <strong>Intention to Treat</strong> (for high-score descriptors, score ≥ 8)</li>
+                        <li><code>{{ npsle_tips }}</code> → <strong>NPSLE Tips</strong> (for neuropsychiatric descriptors)</li>
+                    </ul>
+                </div>
+                
+                <textarea id="templateEditor" class="template-editor" rows="18" placeholder="Template content..."></textarea>
+            </div>
+            
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeTemplateModal()">Cancel</button>
+                <button class="btn-primary" id="saveTemplateBtn">💾 Save Template</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Treatment Logic Modal (Shows Both Prompts) -->
+    <div id="treatmentLogicModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeTreatmentLogicModal()"></div>
+        <div class="modal-container" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>✏️ Edit Treatment Logic</h3>
+                <button class="modal-close" onclick="closeTreatmentLogicModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info" style="margin-bottom: 20px;">
+                    The treatment_logic placeholder inserts different prompts based on descriptor type:
+                    <ul style="margin-top: 8px; margin-left: 20px; font-size: 0.8rem;">
+                        <li><strong>Low-score descriptors (score &lt; 8):</strong> Uses "Treatment Response" prompt</li>
+                        <li><strong>High-score descriptors (score ≥ 8):</strong> Uses "Intention to Treat" prompt</li>
+                    </ul>
+                </div>
+                
+                <!-- Treatment Response Prompt (for low-score descriptors) -->
+                <div class="editor-section" style="background: var(--bg); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span class="badge" style="background: #10b981;">Score &lt; 8</span>
+                        <label class="editor-label" style="margin-bottom: 0;">Treatment Response Prompt</label>
+                    </div>
+                    <textarea id="treatmentResponseEditor" class="template-editor" rows="6" placeholder="Treatment response prompt..."></textarea>
+                    <small class="help-text">Used for: arthritis, myositis, rash, alopecia, mucosal ulcers, pleurisy, pericarditis, low_complement, increased_DNA_binding, fever, thrombocytopenia, leukopenia</small>
+                </div>
+                
+                <!-- Intention to Treat Prompt (for high-score descriptors) -->
+                <div class="editor-section" style="background: var(--bg); padding: 16px; border-radius: 12px;">
+                    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                        <span class="badge" style="background: #f59e0b;">Score ≥ 8</span>
+                        <label class="editor-label" style="margin-bottom: 0;">Intention to Treat Prompt</label>
+                    </div>
+                    <textarea id="intentionToTreatEditor" class="template-editor" rows="6" placeholder="Intention to treat prompt..."></textarea>
+                    <small class="help-text">Used for: seizure, psychosis, organic brain syndrome, visual disturbance, cranial nerve disorder, lupus headache, CVA, vasculitis</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeTreatmentLogicModal()">Cancel</button>
+                <button class="btn-primary" id="saveTreatmentLogicBtn">💾 Save Both</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit NPSLE Tips Modal -->
+    <div id="npsleModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeNpsleModal()"></div>
+        <div class="modal-container" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>✏️ Edit NPSLE Tips</h3>
+                <button class="modal-close" onclick="closeNpsleModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info" style="margin-bottom: 16px;">
+                    These tips are added to neuropsychiatric SLE descriptors (seizure, psychosis, organic brain syndrome, visual disturbance, cranial nerve disorder, lupus headache, CVA, vasculitis)
+                </div>
+                
+                <div class="editor-section">
+                    <label class="editor-label">NPSLE Tips Prompt</label>
+                    <textarea id="npsleModalEditor" class="template-editor" rows="10" placeholder="NPSLE tips content..."></textarea>
+                    <small class="help-text">These tips help the LLM better understand neuropsychiatric manifestations in SLE</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" onclick="closeNpsleModal()">Cancel</button>
+                <button class="btn-primary" id="saveNpsleBtn">💾 Save</button>
+            </div>
+        </div>
     </div>
 
     <script src="script.js"></script>
