@@ -1,3 +1,5 @@
+## Run save_prompts.py whenever there are new changes to this file
+
 TYPE_A = 'type_a'
 TYPE_B = 'type_b'
 
@@ -162,7 +164,7 @@ keywords_list = {
     ## TYPE A
     'seizure': {
         'diagnostic': 'NPSLE, seizure, epilepsy, grand mal, petit mal, drop attack',
-        'symptoms': 'loss of consciousness (LOC), loss of awareness, tonic, clonic, myoclonic, atnoic, generalized stiffness, twitching, uprolling eyeballs, tongue bite',
+        'symptoms': 'loss of consciousness (LOC), loss of awareness, tonic, clonic, myoclonic, atonic, generalized stiffness, twitching, uprolling eyeballs, tongue bite',
     },
     'psychosis': {
         'diagnostic': 'psychosis, psychotic disorder',

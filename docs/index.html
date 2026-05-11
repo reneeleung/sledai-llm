@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SLEDAI-2K Prompt Customizer | Clinical NLP Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">🏥</span>
+                <span class="logo-text">SLEDAI-2K Prompt Customizer</span>
+            </div>
+            <div class="nav-links">
+                <a href="https://github.com/reneeleung/sledai-llm" class="nav-link" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <!-- Collapsible Configuration -->
+            <div class="sidebar-card collapsible">
+                <div class="sidebar-card-header" onclick="toggleConfig()">
+                    <span>⚙️</span>
+                    <h3>Configuration</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="sidebar-card-body config-body">
+                    <div class="config-option">
+                        <label class="config-label">Note Type</label>
+                        <div class="config-select">
+                            <select id="noteTypeSelect">
+                                <option value="outpatient">Outpatient (assess at visit date)</option>
+                                <option value="discharge">Discharge (assess at admission date)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="config-option">
+                        <label class="config-label">Output Mode</label>
+                        <div class="config-select">
+                            <select id="outputModeSelect">
+                                <option value="full">Full Prompt (with clinical note)</option>
+                                <option value="descriptor">Descriptor Only (just the rules)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Descriptors List -->
+            <div class="sidebar-card">
+                <div class="sidebar-card-header">
+                    <span>🔍</span>
+                    <h3>Descriptors <span id="descriptorCount"></span></h3>
+                </div>
+                <div class="search-box">
+                    <input type="text" id="descriptorSearch" placeholder="Search descriptors...">
+                </div>
+                <div class="descriptor-list" id="descriptorList"></div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Descriptor Editor -->
+            <div class="main-card" id="descriptorEditor" style="display: none;">
+                <div class="main-card-header">
+                    <div class="descriptor-title">
+                        <h2 id="currentDescriptorTitle">Select a descriptor</h2>
+                    </div>
+                    <button id="resetDescriptorBtn" class="btn-outline">↺ Reset to Default</button>
+                </div>
+                
+                <div class="main-card-body">
+                    <!-- Type A (Clinical) -->
+                    <div id="typeAEditor" style="display: none;">
+                        <div class="alert alert-info">
+                            <span>🩺</span> Clinical Descriptor - Edit diagnostic criteria
+                        </div>
+                        
+                        <div class="editor-section">
+                            <label class="editor-label">Diagnostic Criteria</label>
+                            <textarea id="diagnosticCriteria" class="editor-textarea" rows="4" 
+                                      placeholder="List the criteria required..."></textarea>
+                        </div>
+                        
+                        <div class="editor-section">
+                            <label class="editor-label">Exclusion Criteria</label>
+                            <textarea id="clinicalExclusions" class="editor-textarea" rows="2" 
+                                      placeholder="What to exclude?"></textarea>
+                        </div>
+                        
+                        <div class="editor-section">
+                            <label class="editor-label">Additional Notes / Remarks</label>
+                            <textarea id="clinicalNotes" class="editor-textarea" rows="3" 
+                                      placeholder="Important notes, threshold details, special instructions..."></textarea>
+                        </div>
+                        
+                        <div class="editor-section">
+                            <label class="editor-label">Keywords to Look For</label>
+                            <textarea id="keywords" class="editor-textarea" rows="2" 
+                                      placeholder="Relevant keywords..."></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- Type B (Lab tests) -->
+                    <div id="typeBEditor" style="display: none;">
+                        <div class="alert alert-info">
+                            <span>⚕️</span> Laboratory Descriptor - Customize thresholds, units, and time-specific ranges
+                        </div>
+                        
+                        <!-- Quantitative Thresholds FIRST -->
+                        <div class="editor-section">
+                            <label class="editor-label">Quantitative Thresholds</label>
+                            <div class="thresholds-header">
+                                <span class="threshold-label date-label">Time Period / Applicability</span>
+                                <span class="threshold-label value-label">Threshold & Units</span>
+                                <span class="threshold-label action-label"></span>
+                            </div>
+                            <div id="thresholdRows" class="threshold-rows">
+                                <!-- Dynamic rows will be added here -->
+                            </div>
+                            <button id="addThresholdRow" class="btn-small" type="button">+ Add Threshold</button>
+                            <small class="help-text">Add multiple rows for different time periods or different biomarkers (e.g., C3 and C4)</small>
+                        </div>
+                        
+                        <!-- Qualitative Handling SECOND -->
+                        <div class="editor-section">
+                            <label class="editor-label">Qualitative Value Handling</label>
+                            <textarea id="qualitativeRules" class="editor-textarea" rows="4" 
+                                    placeholder="How to interpret non-numeric results like 'low', 'reduced', '+++', '3+', 'high', etc.&#10;Example: 'low', 'reduced' => fulfilled | 'nl', 'normal' => unfulfilled"></textarea>
+                            <small class="help-text">Define how text-based results should be interpreted</small>
+                        </div>
+                        
+                        <!-- Exclusion Criteria -->
+                        <div class="editor-section">
+                            <label class="editor-label">Exclusion Criteria</label>
+                            <textarea id="exclusionCriteria" class="editor-textarea" rows="3" 
+                                    placeholder="e.g., Exclude drug causes, infection, portal hypertension, stones, menstruation"></textarea>
+                        </div>
+                        
+                        <!-- Additional Notes -->
+                        <div class="editor-section">
+                            <label class="editor-label">Additional Notes / Remarks</label>
+                            <textarea id="labNotes" class="editor-textarea" rows="4" 
+                                    placeholder="Any special instructions, methodology notes, exceptions, or additional requirements..."></textarea>
+                        </div>
+
+                        <!-- Keywords to Look For (for Type B) -->
+                        <div class="editor-section">
+                            <label class="editor-label">Keywords to Look For</label>
+                            <textarea id="typeBKeywords" class="editor-textarea" rows="2" 
+                                    placeholder="e.g., C3, C4, complements, PLT, platelet, anti-ds DNA, WCC, WBC..."></textarea>
+                            <small class="help-text">Keywords that indicate this lab test is being discussed</small>
+                        </div>
+                    </div>
+
+                    <!-- Raw editor -->
+                    <div class="raw-toggle">
+                        <button id="toggleRawEditor" class="btn-text">✏️ Edit Raw Prompt Format</button>
+                    </div>
+                    <div id="rawEditor" style="display: none;">
+                        <textarea id="rulesEditor" class="raw-textarea" rows="8" 
+                                  placeholder="Raw prompt rules..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clinical Note Card -->
+            <div class="main-card" id="clinicalNoteCard">
+                <div class="main-card-header">
+                    <h2>📝 Clinical Note</h2>
+                    <button id="clearNoteBtn" class="btn-outline">Clear</button>
+                </div>
+                <div class="main-card-body">
+                    <div class="date-section">
+                        <label class="editor-label" id="dateLabel">📅 Assessment Date (Visit Date)</label>
+                        <input type="date" id="assessmentDate" class="editor-input">
+                        <small class="help-text" id="dateHelpText">Select the visit date for outpatient notes</small>
+                    </div>
+                    
+                    <div class="editor-section">
+                        <label class="editor-label">Clinical Note Text</label>
+                        <textarea id="clinicalNote" class="clinical-textarea" rows="10" 
+                                placeholder="Paste your clinical note here..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Output -->
+            <div class="main-card output-card">
+                <div class="main-card-header">
+                    <h2>📤 Generated Prompt</h2>
+                    <button id="copyOutputBtn" class="btn-outline">📋 Copy</button>
+                </div>
+                <div class="output-container">
+                    <pre id="outputContent" class="code-block">Select a descriptor to begin...</pre>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,505 @@
+{
+  "definitions": {
+    "rash": {
+      "criteria": "Either one form of lupus rash from these three class of lupus erythematosus:\nA. Acute cutaneous lupus erythematosus (ACLE), either one:\n  1. lupus malar rash;\n  2. bullous lupus; \n  3. toxic epidermal necrolysis variant of SLE; \n  4. maculopapular lupus rash; \n  5. photosensitive lupus rash in the absence of dermatomyositis; \nB. subacute cutaneous lupus erythematosus (SCLE), either one:\n  1. Annular form\n  2. Papulosquamous form\nC. Chronic cutaneous lupus erythematosus (CCLE), either one:\n  1. classical discoid lupus erythematosus (DLE)\n  2. localized DLE (above the neck)\n  3. generalized DLE (above and below the neck)\n  4. hypertrophic (verrucous) lupus\n  5. lupus panniculitis (profundus)\n  6. mucosal lupus\n  7. lupus erythematosus tumidus\n  8. chillblains lupus (CHLE, pernio)\n  9. lichen planus overlap \n\nNote: A \"lupus rash\" can only be scored if it was clinically diagnosed as such. Descriptions of skin changes based solely on morphology and location are considered insufficient for scoring a “lupus rash”, unless the rash was documented as a classic manifestation (e.g., typical malar distribution). Furthermore, rashes described solely as \"skin damage\" or residual changes should not be scored, as the SLEDAI-2K is designed to capture active inflammatory rash.\nHere is the vocabulary to help distinguish between lupus activity versus damage:\nActivity (erythema):\npink, faint erythema, pinkish, faint erythema,\nfaintly erythematous, mild erythema, mildly erythematous, mild redness, mildly red,\nerythematous, erythema, moderate erythema, moderately erythematous. moderate erythematous,\nred, redness, reddish, dark red, deep red, deeply red, deep reddish, deeply reddish, purple, purplish, violaceous\n\nActivity (scale/hypertrophy):\nScale, scaling, scaly, follicular plugging, follicular prominence, carpet tacking, carpet tack sign, perifollicular scale \nHypertrophy, hypertrophic, hyperkeratosis, hyperkeratotic\n\nDamage (Dyspigmentation):\nHypopigmentation, hypopigmented, hyperpigmentation, hyperpigmented,\ndyspigmentation, dyspigmented, pigmentary changes, brown, depigment, white\n\nDamage (scarring/atrophy/panniculitis):\nScarring, scar, Atrophic scarring, atrophic, panniculitis, lipoatrophy, atrophic scar",
+      "exclusions": "-\tExclusions for ACLE: \n• Localized form: rosacea, seborrheic eczema, perioral dermatitis, tinea faciei, erysipelas\n• Generalized form: dermatomyositis, viral and drug-induced rash, erythema multiforme, TEN\n• Bullous lupus erythematosus (BLE): Epidermolysis bullosa acquisita, dermatitis herpetiformis (Duhring's disease), bullous pemphigoid, linear IgA-dermatosis, drug-induced bullous disorder, porphyria cutanea tarda\n\n-\tExclusions for SCLE:\n• Psoriasis vulgaris, tinea corporis, mycosis fungoides, erythema annulare centrifugum, dermatomyositis, pityriasis rubra pilaris, nummular eczema, drug-induced rash, seborrheic eczema, erythema multiforme /TEN, erythema gyratum repens\n\n-\tExclusions for Discoid lupus erythematosus (DLE).:\n• Actinic keratosis, tinea faciei, sarcoidosis, lupus vulgaris\n\n-\tExclusions for Lupus erythematodes profundus (LEP):\n• Various forms of panniculitis, malignant lymphoma (especially subcutaneous panniculitic T-cell lymphoma), subcutaneous sarcoidosis, panarteritis nodosa, morphea profunda, subcutaneous granuloma annulare\n\n-\tExclusions for Chilblain lupus erythematosus (CHLE):\n• Pernio (chilblains), lupus pernio (chronic form of skin sarcoidosis of the acral regions), acral vasculitis/vasculopathy\n\n-\tExclusions for Lupus erythematosus tumidus (LET):\n• Lymphocytic infiltration Jessner-Kanof or erythema arciforme et palpabile (see text), polymorphic light eruption, pseudolymphoma, B-cell lymphoma, plaque-like cutaneous mucinosis, solar urticaria"
+    },
+    "alopecia": {
+      "criteria": "Hair loss or alopecia",
+      "exclusions": "-\talopecia areata\n-\tiron deficiency\n-\tandrogenic alopecia\n-\tscarring alopecia\n-   drug-induced alopecia"
+    },
+    "mucosal_ulcers": {
+      "criteria": "Oral or nasal (nasopharyngeal) ulceration observed by a clinician, including palate, buccal, tongue or nasal ulcers",
+      "exclusions": "-\tVasculitis\n-\tBehcet's\n-\tinfection (herpes)\n-\tinflammatory bowel disease\n-\treactive"
+    },
+    "pleurisy": {
+      "criteria": "Both  A and B:\nA.\tPleuritic chest pain (typically sharp, worse with inspiration, improved by shallow breathing)\nB.\tpleural rub OR pleural thickening OR imaging confirmed pleuritic effusion (such as ultrasound, x-ray, CT scan, MRI)",
+      "exclusions": "-\tinfection\n-   uremia (BUN > 40 mg/dL)"
+    },
+    "CVA": {
+      "criteria": "One of the following and supporting radio imaging study, exclused arteriosclerosis:\nA. Stroke syndrome: acute focal neurologic deficit persisting more than 24 hours (or lasting less than 24 hours with CT or MRI abnormality consistent with physical findings/symptoms\nB. Transient ischemic attack: acute, focal neurologic deficit with clinical resolution within 24 hours (without corresponding lesion on CT or MRI)\nC. Subarachnoid and intracranial hemorrhage: bleeding documented by CSF findings or MRI/CT\nD. Sinus thrombosis: Acute, focal neurologic deficit in the presence of increased intracranial pressure\nNB: The finding of unidentified bright objects on MRI without clinical manifestations is not classified at the present time",
+      "exclusions": "-\tAseptic meningitis (including drug-induced)\n-\tDrug-induced pseudotumor cerebri (oral contraceptives, sulfonamides, trimethoprim,  etc.)\n-\tCNS infection\n-\tTumors and other structural lesions\n-\tLow intracranial pressure\n-\tTrauma\n-\tMetabolic headache that remits with elimination of cause (carbon monoxide exposure)\n-\tWithdrawal (caffeine, etc.)\n-\tSeizure/postictal state\n-\tSepsis\n-\tIntracranial hemorrhage or vascular occlusion"
+    },
+    "vasculitis": {
+      "criteria": "Either one:\nA.\tclinician observed cutaneous vasculitis with at least one of the following description of lesions: Ulceration, gangrene, lender finger nodules, periungual infarction (or necrosis), splinter hemorrhages\nB.\tbiopsy or angiogram proof of cutaneous vasculitis",
+      "exclusions": "-mimics of vasculitis (Atheroembolic disease, Atheromatous vascular disease, Anti-phospholipid syndrome, Multiple myeloma, Infective endocarditis, Para-neoplastic syndromes, Genetic vascular disorders (e.g. Marfan’s syndrome), Autoinflammatory syndromes, Hypersensitivity reactions, Cocaine and amphetamine abuse)\n-Infections (Tuberculosis, Hepatitis B, Hepatitis C, HIV)\n-Malignancy (Lymphoma, Solid organ malignancy)\n-Drugs (Penicillamine, Propylthiouracil, Hydralazine, Minocycline, Cocaine)\n-Environmental exposure (including Dusts and Silica)"
+    },
+    "arthritis": {
+      "criteria": "Either one: \nA. two or more joints with pain and signs of inflammation (e.g., tenderness, swelling, or effusion) \nB. synovitis involving two or more joints characterized by swelling or effusion\nC. two or more joints tenderness and 30 minutes or more of morning stiffness",
+      "exclusions": "-\tinfection (a septic joint or as osteomyelitis): tuberculosis, Bacterial, viral \n-\tstress fractures\n-\tCrystal arthritis: Gout, calcium pyrophosphate deposition disease\n-   Noninflammatory arthritis, such as osteoarthritis and avascular necrosis (AVN)  (especially for hip, knee or shoulder)\n-\tRheumatoid arthritis"
+    },
+    "myositis": {
+      "criteria": "All of the following: \nA. proximal muscle aching(myalgias)/weakness, \nB. associated with elevated creatine phosphokinase/aldolase or electromyogram (EMG) changes or a biopsy showing myositis",
+      "exclusions": "-\tCK elevation was unexplained, isolated, felt to be related to rhabdomyolysis, exertion, infection, or the toxic effect of medication (i.e., statin,hydroxychloroquine-induced myotoxicity)\n-\tcancer-associated myositis\n-\tmetabolic muscle disease"
+    },
+    "seizure": {
+      "criteria": "A with or without the presence of B: \nA.\tIndependent description of seizure by a reliable witness\nB.\tEEG abnormalities",
+      "exclusions": "-\tMedications: quinolones, imipenem\n-\tAlcohol and drug withdrawal (phenothiazines, antipsychotics)\n-\telectrolyte imbalance (acidosis, serum sodium, calcium, and hypoglycemia)\n-\torgan failure (hepatic and renal failure)\n-\tinfection\n-\tdue to past irreversible CNS damage\n-\tVasovagal syncope\n-\tCardiac syncope\n-\tHysteria\n-\tHyperventilation\n-\tTics\n-\tNarcolepsy and cataplexy\n-\tLabyrinthitis\n-\tSubarachnoid hemorrhage\n-\tTrauma\n-\tPanic attacks, conversion disorders, and malingering\n-\thypersensitivity encephalopathy\n"
+    },
+    "psychosis": {
+      "criteria": "All of the following:\nA.\tAt least one of the following:\n  1. Delusions\n  2. Hallucinations without insight (visual, olfactory, gustatory, tactile, or auditory)\n  3. Disorganized thinking (speech) (frequent derailment; loose associations; incoherence; “word salad”)\n  4. Grossly disorganized or abnormal motor behavior (childlike “silliness”; unpredictable agitation; catatonic behavior; negativism; mutism and stupor; catatonic excitement; stereotyped movements, staring; grimacing, mutism; echoing of speech)\n  5. Negative symptoms (diminished emotional expression; avolition; alogia; anhedonia; asociality)\n\nB.\tThe disturbance causes clinical distress or impairment in social, occupational, or other relevant areas of functioning.\nC.\tThe disturbance does not occur exclusively during the course of a delirium.\nD.\tThe disturbance is not better accounted for by another mental disorder (e.g., mania).",
+      "exclusions": "-\tUremia (BUN > 40 mg/dL)\n-\tSubstance- or drug-induced psychotic disorder (including NSAIDs, antimalarials)\n-\tacidosis, or electrolyte imbalance\n-\tdelirium\n-\tPrimary psychotic disorder unrelated to SLE (e.g., schizophrenia)\n-\tPsychologically mediated reaction to SLE (brief reactive psychosis with major stressor)"
+    },
+    "organic_brain_syndrome": {
+      "criteria": "organic brain syndrome\norganic brain disorder\nacute confusional state\ndelirium\nencephalopathy\nneurocognitive disorders\n\nDiagnostic criteria:\nAll of the following:\nA. A disturbance in attention (i.e., reduced ability to direct, focus, sustain, and shift attention) or awareness (reduced orientation to the environment)\nB. Rapid onset and fluctuating clinical features: develops over a short period of time (usually hours to a few days), represents a change from baseline attention and awareness, and tends to fluctuate in severity during the course of a day\nC. Plus at least two of the following:\n  1. perceptual disturbance (misinterpretations, illusions, or hallucinations)\n  2. incoherent speech\n  3. insomnia or daytime drowsiness\n  4. increased or decreased psychomotor activity (Hyperactive/ Hypoactive)",
+      "exclusions": "-\tPrimary mental/neurologic disorder not related to SLE.\n-\tMetabolic disturbances (glucose > 25; serum sodium <125 or >155; serum calcium >3)",
+      "notes": "NB: Preexisting cognitive deficits are not an exclusion. If acute confusional state is superimposed on preexisting cognitive deficits, diagnose both."
+    },
+    "visual_disturbance": {
+      "criteria": "Either (1) or (2)\n(1) Retinopathy or choroidopathy with one criteria below, usually bilateral: \nA.\tcytoid bodies (cotton-wool spots or retinal soft exudates)\nB.\tretinal hemorrhages\nC.\tserous exudate in the choroid\nD.\tserous hemorrhages in the choroid\n\n(2) Optic neuritis\nClinical criteria (A), (B), or (C) if seen acutely; or at least one Paraclinical criteria with a medical history suggestive of optic neuritis\n1. Clinical criteria:\nA.\tMonocular, subacute loss of vision associated with orbital pain worsening oneye movements, reduced contrast and colour vision, and relative afferent pupillary deficit (RAPD)\nB.\tPainless with all other features of (A).\nC.\tBinocular loss of vision with all features of (A) or (B).\n2. Paraclinical criteria: \nA.\tOCT: Corresponding optic disc swelling acutely or an inter-eye difference in the mGCIPL of >4% or >4 μm or in the pRNFL of >5% or >5 μm within 3 months after onset.\nB.\tMRI: Contrast enhancement of the symptomatic optic nerve and sheaths acutely or an intrinsic signal (looking brighter) increase within 3 months.",
+      "exclusions": "-\thypertension (BP > 180/120)\n-\tInfectious, post-infectious or post-vaccination\n-\tdrug caused\n-\tdrusen (for cytoid bodies)\n-\tAutoimmune ON: multiple sclerosis (MS), Aquaporin4 IgG antibodies-associated neuromyelitis optica spectrum disorder (NMOSD) or Anti-myelin oligodendrocytes glycoprotein antibody-associated disease (MOGAD)"
+    },
+    "cranial_nerve_disorder": {
+      "criteria": "Diagnostic criteria:\nNew onset of focal sensory or motor neuropathy involving cranial nerves.\nSyndrome corresponding to specific nerve function:\nI.\tOlfactory nerve: Loss of sense of smell, distortion of smell, and loss of olfactory discrimination \nII.\tOptic nerve: [Intentionally omitted. Not evaluated under cranial nerve disorder criteria.]\nIII.\tOculomotor nerve: Ptosis of the upper eyelid and inability to rotate eye upward, downward, or inward (complete lesion), and/or dilated nonreactive pupil and paralysis of accommodation (interruption of parasympathetic fibers only)\nIV.\tTrochlear nerve: Extortion and weakness of downward movement of affected eye\nV.\tAbducens nerve: Weakness of eye abduction\nVI.\tTrigeminal nerve: Paroxysm of pain in lips, gums, cheek, or chin initiated by stimuli in trigger zone (trigeminal neuralgia) and sensory loss of the face or weakness of jaw muscles\nVII.\tFacial nerve: Unilateral or bilateral paralysis or facial expression muscles, impairment of taste, and hyperacusis (painful sensitivity to sounds)\nVIII.\tVestibulo-cochlear nerve: Deafness, tinnitus (cochlear), dizziness and/or vertigo (vestibular)\nIX.\tGlossopharyngeal nerve: Swallowing difficulty, deviation of soft palate to normal side, anesthesia of posterior pharynx and/or glossopharyngeal neuralgia (unilateral stabbing pain in root of tongue and throat, triggered by coughing, sneezing, swallowing, and pressure on ear tragus)\nX.\tVagus nerve: Soft palate droop, loss of the gag reflex, hoarseness, nasal voice, and/or loss of sensation at external auditory meatus.\nXI.\tAccessory nerve: Weakness and atrophy of sternocleidomastoid muscle and upper part of trapezius muscle.\nXII.\tHypoglossal nerve: Paralysis of one side of tongue with deviation to the affected side",
+      "exclusions": "-\tNerve palsy caused by stroke, seizure, or intracranial hypertension\n-\tSkull fracture\n-\tTumor: meningioma, carcinomatous meningitis, aneurysm\n-\tInfection: herpes zoster, neuroborreliosis, syphilis, mucormycosis\n-\tMiller Fisher syndrome"
+    },
+    "lupus_headache": {
+      "criteria": "Either type of headache below, and should be severe (disabling headache), persistent (lasts ≥3 days) also nonresponsive to narcotic analgesia (e.g. heroin, fentanyl, byprenorpine, oxycodone methadone, and morphine). \nA. Migraine\n \nMigraine without aura: Idiopathic, recurrent headache manifested by attacks lasting 4-72 hours. Typical characteristics are unilateral location, pulsating quality, moderate to severe intensity, aggravation by routine physical activity, and associated with nausea, vomiting, photo- and phonophobia. At least 5 attacks fulfilling the above criteria.\nMigraine with aura: Idiopathic, recurrent disorder manifested by attacks of neurologic symptoms localizable to cerebral cortex or brain stem, usually gradually developing over 5-20 minutes and lasting less than 60 minutes. Headache, nausea, and/or photophobia usually follow neurologic aura symptoms directly or after an interval of less than 1 hour. Headache usually lasts 4-72 hours, but may be completely absent.\nB. Tension headache (episodic tension type headache)\n\nRecurrent episodes of headaches lasting minutes to days. Pain typically pressing/tightening in quality, of mild to moderate intensity, bilateral in location, and does not worsen with routine physical activity. Nausea is rare, but photophobia and phonophobia may be present. At least 10 previous headaches fulfilling these criteria.\nC. Cluster headache\n \nAttacks of severe, strictly unilateral pain, orbital, supraorbital, and/or temporal, usually lasting 15-180 minutes and occurring from at least once every other day up to 8 times per day. Associated with one   or more of the following: conjunctival injection, lacrimation, nasal congestion, rhinorrhea, forehead and facial sweating, myosis, ptosis, eyelid edema. Attacks occur in series for weeks or months (\"cluster\" periods) separated by remissions of usually months or years.\nD. Headache from intracranial hypertension (Pseudotumor cerebri, benign intracranial hypertension)\n\nAll of the following:\nIncreased intracranial pressure (200 mm HiO) measured by lumbar puncture\nNormal neurologic findings except for papilledema and possible nerve VI palsy\nNo mass lesion and no ventricular enlargement on neuroimaging\nNormal or low protein and normal white cell count in CSF\nNo evidence of venous sinus thrombosis\nE. Intractable headache, nonspecific",
+      "exclusions": "-\tAseptic meningitis (including drug-induced)\n-\tDrug-induced pseudotumor cerebri (oral contraceptives, sulfonamides, trimethoprim,  etc.)\n-\tCNS infection (meningitis/encephalitis)\n-\tTumors and other structural lesions\n-\tLow intracranial pressure\n-\tTrauma\n-\tMetabolic headache that remits with elimination of cause (carbon monoxide exposure)\n-\tWithdrawal (caffeine, etc.)\n-\tSeizure/postictal state\n-\tSepsis\n-\tIntracranial hemorrhage or vascular occlusion"
+    },
+    "pericarditis": {
+      "criteria": "Both  A and B:\nA.\tpericardial pain (typically sharp, worse with inspiration, improved by leaning forward)\nB.\tpericardial rub OR EKG with new widespread ST-elevation or PR depression OR new/worsen imaging confirmed pericardial effusion (such as ultrasound, x-ray, CT scan, MRI)",
+      "exclusions": "-\tinfection (coxsackievirus, mycoplasma, tuberculosis)\n-\turemia (BUN > 40 mg/dL)\n-\tDressler's pericarditis (post-myocardial infarction syndrome)"
+    },
+    "fever": {
+      "criteria": ">38°C (Exclude infectious cause)",
+      "exclusions": "-\tInfection (usually have high WBC, high CRP or definite localizing infective foci)\n-\tmalignancy (especially lymphoma)"
+    },
+    "urinary_casts": {
+      "qualitative": "Heme-granular or red blood cell casts.",
+      "thresholds": [],
+      "exclusions": "",
+      "notes": ""
+    },
+    "hematuria": {
+      "qualitative": "Urine RBC 2+, ++, 2+ve, ++ve, +++ve, etc. can be considered as >5 red blood cells/high-power field.\n\"urine RBC +\" should not be fulfilled.\nValues such as \"high/moderate\" or similar terms should be considered as uncertain.\n\nNOTE: Requires abnormal urine protein (dipstick positive or urine protein/creatinine > 0.15mg/mg or 24-hour urine protein >0.15gram/24 hours). In cases of conflict: 24-hour urine protein > urine protein/creatinine (UPC) > dipstick.",
+      "thresholds": [
+        {
+          "date_range": "RBC count",
+          "condition": ">",
+          "value": "5",
+          "units": "red blood cells/high-power field"
+        },
+        {
+          "date_range": "Alternative",
+          "condition": ">",
+          "value": "30",
+          "units": "/uL"
+        }
+      ],
+      "exclusions": "stones, infection or other cause (menstruation).",
+      "notes": "Microscopic haematuria is most commonly defined as >3 red blood cells per high-power field, but this study uses a threshold of >5. Therefore, values between 3-5 should be considered uncertain."
+    },
+    "proteinuria": {
+      "qualitative": "UP dipstick results (e.g., \"+\", \"+++\", \"+ve\") are generally uncertain. Numeric values must meet criteria above.\nException: A dipstick reading of 3+ or greater may be scored as fulfilled when correlated with a physician's clinical impression of a lupus flare (i.e., one necessitating escalation of therapy for lupus nephritis).",
+      "thresholds": [
+        {
+          "date_range": "24-hour urine",
+          "condition": ">",
+          "value": "0.50",
+          "units": "gram/24 hours"
+        },
+        {
+          "date_range": "Urine protein/creatinine",
+          "condition": ">",
+          "value": "0.50",
+          "units": "mg/mg (equivalent to 0.50 g/g or 50 mg/mmol)"
+        }
+      ],
+      "exclusions": "",
+      "notes": "If the two results are conflicting at the same time, the 24-hour protein result shall prevail.\nIf UPC unit is unspecified, presume mg/mmol scale for values >20, mg/mg for values <5, and flag uncertain for values in between."
+    },
+    "pyuria": {
+      "qualitative": "urine WBC 2+, urine WBC ++, etc., or urine WBC >= 10-50/uL can be considered as >5 white blood cells/high-power field.\n\"urine WBC +\" should not be counted.\n\nNOTE: Requires abnormal urine protein (dipstick positive (UP+ or above) or Urine protein/creatinine > 0.15mg/mg (15mg/mmol or 0.15g/g) or 24-hour urine protein >0.15gram/24 hours). In cases of conflict: 24-hour urine protein > urine protein/creatinine (UPC) > dipstick.",
+      "thresholds": [
+        {
+          "date_range": "WBC count",
+          "condition": ">",
+          "value": "5",
+          "units": "white blood cells/high-power field"
+        }
+      ],
+      "exclusions": "infection. Possible urine infection types include E.coli, Enterococcus, Klebsiella, Pseudomonas, AFB/tuberculosis.",
+      "notes": "If the doctor decides to treat patient with antibiotics or conduct further tests to identify the specific pathogen causing the symptoms, the presence of pyuria is likely due to an infection."
+    },
+    "low_complement": {
+      "qualitative": "Use lab flags first:\n- \"low\", \"reduced\", or similar terms => fulfilled\n- \"nl\" (normal), \"high\" => unfulfilled\n- trend-based terms like \"lower\" => uncertain\n- If a flag is present, it overrides the numeric value even if the value doesn't meet the threshold.",
+      "thresholds": [
+        {
+          "date_range": "24/12/2018 till now (C3)",
+          "condition": "<",
+          "value": "90",
+          "units": "mg/dL"
+        },
+        {
+          "date_range": "before 24/12/2018 (C3)",
+          "condition": "<",
+          "value": "76",
+          "units": "mg/dL"
+        },
+        {
+          "date_range": "24/12/2018 till now (C4)",
+          "condition": "<",
+          "value": "10",
+          "units": "mg/dL"
+        },
+        {
+          "date_range": "before 24/12/2018 (C4)",
+          "condition": "<",
+          "value": "9",
+          "units": "mg/dL"
+        }
+      ],
+      "exclusions": "",
+      "notes": "For C3: Presume mg/dL scale for values >10, g/L for values <2, and flag uncertain for values in between.\nNo test for CH50 in this study."
+    },
+    "increased_DNA_binding": {
+      "qualitative": "Qualitative values (such as \"high\", \"+\", \"rising\", or similar terms) should be considered uncertain for ELISA, but should be considered fulfilled for other methods.\nIf methodology is not mentioned, assume it is ELISA.\n\nNOTE: For non-ELISA methods: above laboratory reference range. For ELISA: twice above laboratory reference range.",
+      "thresholds": [
+        {
+          "date_range": "1/2/2021 till now (ELISA)",
+          "condition": ">",
+          "value": "10",
+          "units": "IU/ml"
+        },
+        {
+          "date_range": "21/1/2013 to 1/2/2021 (ELISA)",
+          "condition": ">",
+          "value": "25",
+          "units": "IU/ml"
+        },
+        {
+          "date_range": "before 21/1/2013 (ELISA)",
+          "condition": ">",
+          "value": "67.5",
+          "units": "IU/ml"
+        }
+      ],
+      "exclusions": "",
+      "notes": "If the clinical note states a reference range, often in brackets, use its provided reference.\n\"nl\" means normal range."
+    },
+    "thrombocytopenia": {
+      "qualitative": "Qualitative values such as \"low\", \"mild\", or similar terms should be considered as uncertain. The exact numerical value must be stated and meet the criteria.",
+      "thresholds": [
+        {
+          "date_range": "Platelet count",
+          "condition": "<",
+          "value": "100000",
+          "units": "/mm3"
+        },
+        {
+          "date_range": "Platelet count",
+          "condition": "<",
+          "value": "100",
+          "units": "x 10^9/L"
+        }
+      ],
+      "exclusions": "drug causes, portal hypertension, and thrombotic thrombocytopenic purpura",
+      "notes": "In clinical practice, the default unit is 1000/mm3 or 10^9/L"
+    },
+    "leukopenia": {
+      "qualitative": "Qualitative values such as \"low\" or similar terms should be considered as uncertain. The exact numerical value must be stated and meet the criteria above.",
+      "thresholds": [
+        {
+          "date_range": "WBC count",
+          "condition": "<",
+          "value": "3000",
+          "units": "/mm3"
+        },
+        {
+          "date_range": "WBC count",
+          "condition": "<",
+          "value": "3",
+          "units": "x 10^9/L"
+        }
+      ],
+      "exclusions": "Felty's, drug causes and portal hypertension",
+      "notes": "Only consider leucocyte counts labeled as WCC or WBC. Do not consider ANC.\nIn clinical practice, the default unit is 1000/mm3 or 10^9/L"
+    }
+  },
+  "weights": [
+    [
+      "seizure",
+      8,
+      "type_a"
+    ],
+    [
+      "psychosis",
+      8,
+      "type_a"
+    ],
+    [
+      "organic_brain_syndrome",
+      8,
+      "type_a"
+    ],
+    [
+      "visual_disturbance",
+      8,
+      "type_a"
+    ],
+    [
+      "cranial_nerve_disorder",
+      8,
+      "type_a"
+    ],
+    [
+      "lupus_headache",
+      8,
+      "type_a"
+    ],
+    [
+      "CVA",
+      8,
+      "type_a"
+    ],
+    [
+      "vasculitis",
+      8,
+      "type_a"
+    ],
+    [
+      "arthritis",
+      4,
+      "type_a"
+    ],
+    [
+      "myositis",
+      4,
+      "type_a"
+    ],
+    [
+      "urinary_casts",
+      4,
+      "type_b"
+    ],
+    [
+      "hematuria",
+      4,
+      "type_b"
+    ],
+    [
+      "proteinuria",
+      4,
+      "type_b"
+    ],
+    [
+      "pyuria",
+      4,
+      "type_b"
+    ],
+    [
+      "rash",
+      2,
+      "type_a"
+    ],
+    [
+      "alopecia",
+      2,
+      "type_a"
+    ],
+    [
+      "mucosal_ulcers",
+      2,
+      "type_a"
+    ],
+    [
+      "pleurisy",
+      2,
+      "type_a"
+    ],
+    [
+      "pericarditis",
+      2,
+      "type_a"
+    ],
+    [
+      "low_complement",
+      2,
+      "type_b"
+    ],
+    [
+      "increased_DNA_binding",
+      2,
+      "type_b"
+    ],
+    [
+      "fever",
+      1,
+      "type_a"
+    ],
+    [
+      "thrombocytopenia",
+      1,
+      "type_b"
+    ],
+    [
+      "leukopenia",
+      1,
+      "type_b"
+    ]
+  ],
+  "keywords_list": {
+    "seizure": {
+      "diagnostic": "NPSLE, seizure, epilepsy, grand mal, petit mal, drop attack",
+      "symptoms": "loss of consciousness (LOC), loss of awareness, tonic, clonic, myoclonic, atonic, generalized stiffness, twitching, uprolling eyeballs, tongue bite"
+    },
+    "psychosis": {
+      "diagnostic": "psychosis, psychotic disorder",
+      "symptoms": "psychotic, delusions, hallucinations, disorganized thinking/speech, grossly disorganized or abnormal motor behavior, catatonic behavior, paranoia, psychotic beliefs, false beliefs, bizarre beliefs, weird beliefs, sensory misperceptions, perceptual disturbances, illusions, phantom sensations"
+    },
+    "organic_brain_syndrome": {
+      "diagnostic": "NPSLE, organic brain syndrome, organic brain disorder, acute confusional state, delirium, encephalopathy, neurocognitive disorders",
+      "symptoms": "disturbance of consciousness, impaired attention, reduced attention, attention deficit, shift attention, reduced sustain, impaired sustain, reduced ability to direct, reduced ability to focus, reduced ability to sustain, impaired awareness, decreased awareness, reduced awareness, impaired orientation, disorientation, impaired cognition, cognitive impairment, decreased cognitive, impaired cognitive, memory deficit, memory impairment, memory loss, impaired recall, hypomnesia, amnesia, incoherent speech, impaired language ability, disorder language, impaired perception, misinterpretations, illusions, hallucinations, impaired mental function, hyper-aroused/hyperactive, hypo-aroused/hypoactive, coma, sleepiness, insomnia, difficulty falling asleep, nighttime agitation, lack of responsiveness, drowsiness"
+    },
+    "visual_disturbance": {
+      "diagnostic": "retinal disease(s), retinopathy, choroidopathy, optic neuritis, retrobulbar neuritis",
+      "symptoms": "loss of vision, blurring of vision, visual impairment, orbital pain, eye pain, relative afferent pupillary deficit (RAPD), choroid hemorrhage, retinal hemorrhages, cotton-wool spots, exudates, cytoid bodies"
+    },
+    "cranial_nerve_disorder": {
+      "diagnostic": "NPSLE, Bell's palsy, cranial mononeuropathy, cranial polyneuropathy, cranial neuritis, PALSY, paralysis, neuropathy, neuritis, or discorder with the following nerves: cranial nerve, olfactory nerve, optic nerve, oculomotor nerve, trochlear nerve, abducens nerve, trigenminal nerve, facial nerve, vestibulo-cochlear nerve, glossopharyngeal nerve, vagus nerve, accessory nerve, hypoglossal nerve, CN I, CN II, CN III, CN IV, CN V, CN VI, CN VII, CN VIII, CN IX, CN X, CN XI, CN XII, 1st nerve, 2nd nerve, 3rd nerve, 4th nerve, 5th nerve, 6th nerve, 7th nerve, 8th nerve, 9th nerve, 10th nerve, 11th nerve, 12th nerve",
+      "symptoms": "nerve paralysis, nerve PALSY, nerve neuropathy"
+    },
+    "lupus_headache": {
+      "diagnostic": "lupus headache",
+      "symptoms": "headache, cephalagias, migraine"
+    },
+    "CVA": {
+      "diagnostic": "stroke, subarachnoid, hemorrhage, cerebral venous, thrombosis, TIA, transient ischaemic attack, sinus thrombosis",
+      "symptoms": "hemiplegia, unilateral weakness"
+    },
+    "vasculitis": {
+      "diagnostic": "cutaneous vasculitis, vasculitic rash, vasculitic (must be skin-related)",
+      "symptoms": "skin ulceration, skin ulcer(s), gangrene, necorsis, lender finger nodules, periungual infarction, splinter hemorrhages"
+    },
+    "arthritis": {
+      "diagnostic": "arthritis, pauciarticular, polyarthritis, polyarticular",
+      "symptoms": "arthralgia, tenderness, swelling, effusion, morning stiffness, joint pain, pain in these locations: MCP, DIP, PIP, knee, hip, wrist",
+      "paraclinical": "synovial fluid, synovitis, synovial inflammation, synovial proliferation"
+    },
+    "myositis": {
+      "diagnostic": "myositis",
+      "symptoms": "myalgia, muscle aching, muscle weakness",
+      "paraclinical": "elevated CK, CK+, ↑CK"
+    },
+    "rash": {
+      "diagnostic": "cutaneous flare, cutaneous lupus, CLE, lupus erythematosus (LE), malar rash, bullous lupus, toxic epidermal necrolysis variant (TEN), maculopapular lupus rash, photosensitive, discoid, DLE, hypertrophic (verrucous) lupus, lupus panniculitis (profundus), mucosal lupus, lupus erythematosus tumidus, chillblains, lichen planus overlap",
+      "symptoms": "rash"
+    },
+    "alopecia": {
+      "diagnostic": "hair loss, alopecia, aloperic"
+    },
+    "mucosal_ulcers": {
+      "diagnostic": "aphthous ulcer, ulceration, ulcers; the position of the ulcers should be the following: oral, mouth, mucosal, nasal, nasopharyngeal, palate, buccal, tongue"
+    },
+    "pleurisy": {
+      "diagnostic": "serositis, pleurisy, pleuritis",
+      "symptoms": "pleuritic chest pain, pleuritic pain, pleural rub, pleural thickening",
+      "paraclinical": "pleural effusion, pleural fluid"
+    },
+    "pericarditis": {
+      "diagnostic": "pericarditis, hydropericardium",
+      "symptoms": "pericardial pain, pericardial chest pain, pericardial rub, cardiac tamponade",
+      "paraclinical": "pericardial effusion, pericardial fluid"
+    },
+    "fever": {
+      "symptoms": "PUO, fever, any records of temperature more than 38, e.g. Temp ?, ? ℃, ? C"
+    },
+    "urinary_casts": {
+      "keywords": "heme-granular casts, RBC casts"
+    },
+    "hematuria": {
+      "keywords": "hematuria, urine RBC, URBC, urine RC"
+    },
+    "proteinuria": {
+      "keywords": "UP, urine protein, urine P, upr, KSP, UPC, UP/C, UPCR, P/Cr, PC ratio, P/C, 24hr urine protein, 24hr urine pr, 24hr urine x p, 24hUP"
+    },
+    "pyuria": {
+      "keywords": "pyuria, urine WBC, UWBC, urine WC"
+    },
+    "low_complement": {
+      "keywords": "C3, C4, C3/4, complements"
+    },
+    "increased_DNA_binding": {
+      "keywords": "anti-ds DNA, anti DNA, dsDNA"
+    },
+    "thrombocytopenia": {
+      "keywords": "PLT, platelet"
+    },
+    "leukopenia": {
+      "keywords": "WCC, WBC"
+    }
+  },
+  "templates": {
+    "outpatient": "You specialize in evaluating clinical notes for the Systemic lupus erythematosus (SLE) disease.\nGiven the descriptor {{ descriptor }}, score it as 0 or 1 based on the clinical note and information.\nPlease follow this guideline carefully:\n1. Diagnostic criteria:\nGiven the information for {{ descriptor }}, assess the clinical note for evidence and evaluate whether the diagnostic criteria are met. Possible areas include:\n- Diagnostic keywords: Check for the presence of diagnostic keywords which are strong indicators confirming criteria fulfilment. (In such cases, it is not necessary to verify each point within the criteria)\n- Symptoms/signs keywords: Check for the presence of specific symptoms or signs\n- Tests: Check for the value and unit of test results (check latest values; use default units if unspecified). And assess whether they meet criteria thresholds.\nRelevancy check\n- If no keywords are mentioned => `relevant = false`, `score = 0`, and skip remaining steps.\n- If keywords are mentioned => `relevant = true`, and continue this guideline.\n{{ intention_to_treat }}\nExclusions:\n- Look for exclusions in the clinical note that may explain the symptom, but not SLE itself. These exclusions may justify scoring the descriptor but make the criteria `unfulfilled_diagnostic`.\n- Only count exclusions if they are explicitly written in the note. If not mentioned, assume no exclusions.\n- Drug exclusions only apply if the symptom is a common side effect, or if the doctor suspects the drug caused it.\nIf `relevant = true`, classify the diagnostic criteria as:\n- 'fulfilled' (clear evidence the descriptor is met)\n- 'unfulfilled_negated' (the absence of symptoms/diagnosis is explicitly stated in the clinical note)\n- 'unfulfilled_diagnostic' (not enough evidence)\n- 'uncertain' (doctor is uncertain or diagnostic ambiguity)\nNotes and nuances:\n- Terms such as \"decrease/subsided/less/reduced/improved/similar/no increase in\" still imply current symptom presence\n- '?' or 'vs' indicates physician uncertainty, so criteria should be 'uncertain'\n- If multiple values are present for the same test, use the most recent. Watch for collection dates or historical references (terms like 'last'/'prev'). For results 'pending', it is uncertain.\n- If multiple reference ranges exist for the descriptor, check the report date and apply the reference range that corresponds to the time of testing\n- Scan the entire clinical note for all mentions of descriptor keywords. Do not stop at the first mention.\n- If keywords appear in multiple parts of the note, check whether they refer to the same time frame or episode. If yes, evaluate them together. If no, otherwise, evaluate each mention independently.\n- If any independent mention fulfills the criteria, it can support final scoring of the descriptor.\n{{ npsle_tips }}\nAdditional tips:\n- Core lupus drug abbreviations include HCQ (hydroxychloroquine), P/PRED (prednisone), MMF/MPA (mycophenolate), AZA (azathioprine), BEL (belimumab), LEF(Leflunomide), RTX (rituximab), CTX/CYC (cyclophosphamide), TAC/FK506/FK (tacrolimus), and CsA/CYA (cyclosporine).\n- 'P' followed by a number (e.g. P5, P7.5, P20) refers to prescribing and administering oral prednisone at the specified dose in milligrams (mg).\n- The term 'flare' in clinical impressions acts as a diagnostic trigger: it confirms active manifestations fulfilling specific SLEDAI descriptors (e.g. cutaneous flare fulfills lupus rash).\n- In medical documentation, X/52 denotes X weeks and X/12 denotes X months, reflecting durations based on yearly cycles (52 weeks or 12 months).(e.g., 2/52 = 2 weeks, 1/12 = 1 month).\n- The value \"trace\" for test results means +/- (neither positive nor negative)\n\n2. Time frame:\nAfter identifying relevant keywords, symptoms, or test results in the diagnostic assessment, determine how recently the identified entity or finding occurred.\nTime classification should reflect the current status of the symptom as of the documentation date, not when it first began. For example, if the note states 'onset 3 months ago' or '3 months already', it implies the symptom has been present continuously and is still active currently, so the time is still considered within_10days.\nIf the note explicitly states that the symptom has resolved, then the time should reflect when it was last active.\nAssign one of the following categories from the date of the clinical note:\n- 'within_10days' (descriptor is active within the last 10 days)\n- '11_to_30days' (active more than 10 days ago but less than 30 days ago)\n- '30days_ago' (entity was present 30 days ago)\n- 'time_uncertain' (timing of entity cannot be determined)\nTips:\n- Use context from the same part of the note where the descriptor was identified\n- \"recent/frequent/recurrent\" => within_10days\n- \"occasional/sometimes/last visit/last time/on and off\" => time_uncertain\n- if only month and year provided: if match note date => 11_to_30days; otherwise => time_uncertain\n- if no date is specified => default to within_10days unless indications suggest otherwise\nNote that all dates mentioned should follow the format dd/mm/yyyy, unless it doesn't make sense.\nFor time_uncertain or 30days_ago, the descriptor score should be 0.\n\n3. Score calculation:\nDescriptor `score = 1` only if both:\n(1) criteria must be 'fulfilled'\n(2) time is either 'within_10days' or '11_to_30days'\nOutput the score in JSON format.\nInclude:\n- \"confidence_score\": a number from 0 to 10 indicating how confident you are that your predicted score (0 or 1) accurately reflects whether the diagnostic criteria are met, based solely on the information available in the clinical note.\n  - 10 = You are fully confident your prediction is correct, based on clear and direct evidence in the note. This includes explicit confirmation of the criteria (for score 1), explicit negations or absence of relevant keywords (for score 0).\n  - 0 = You have no confidence in your prediction due to ambiguity, conflicting statements, vague language, or missing context in the note.\n  - Scores between 1-9 reflect varying degrees of uncertainty, partial evidence, indirect phrasing, or incomplete documentation.\n  - Note: Your confidence should reflect the clarity and completeness of the clinical note — not the doctor's intent, external medical knowledge, or pending test results. For example:\n    - If the note says \"? alopecia\", you may be highly confident that the physician is uncertain, and therefore confident in assigning score 0.\n    - If a test is mentioned but no result is provided, you may be confident that the criteria are not met, even if the test result is pending.\nYour confidence should reflect how well the note supports your prediction — not whether the criteria are truly met in reality.\n- \"rationale\": a 1-3 sentence explanation of the score. Mention relevant symptoms/signs, tests, any exclusions, time, etc. that helped you conclude this score. Use exact quoted text if citing clinical notes.\n\n\nDiagnostic information for descriptor {{ descriptor }}:\n{{ information }}\n\n{{ keywords }}\n\n==========================================================\nThe clinical note is dated {{ date }} (dd/mm/yyyy).\n\nClinical Note:\n{{ clinical_note }}\n\n===================================================\nOutput JSON format:\n```\n{\n    'descriptor': '{{ descriptor }}', // required\n    'relevant': true or false, // required; write true if keywords are mentioned in the clinical note\n    'criteria': 'unfulfilled_negated' | 'unfulfilled_diagnostic' | 'fulfilled' | 'uncertain' | null, // write null if 'relevant' field is false\n    {{ nature_of_intention_to_treat }}'time': 'within_10days' | '11_to_30days' | '30days_ago' | 'time_uncertain' | null, // write null if 'relevant' field is false\n    'score': 0 or 1, // required\n    'confidence_score': 0 to 10, // required\n    'rationale': '' // required\n}\n```\n",
+    "discharge": "You specialize in evaluating clinical notes for the Systemic lupus erythematosus (SLE) disease.\nGiven the descriptor {{ descriptor }}, score it as 0 or 1 based on the clinical note and information.\nPlease follow this guideline carefully:\n1. Diagnostic criteria:\nGiven the information for {{ descriptor }}, assess the clinical note for evidence and evaluate whether the diagnostic criteria are met. Possible areas include:\n- Diagnostic keywords: Check for the presence of diagnostic keywords which are strong indicators confirming criteria fulfilment. (In such cases, it is not necessary to verify each point within the criteria)\n- Symptoms/signs keywords: Check for the presence of specific symptoms or signs\n- Tests: Check for the value and unit of test results (check latest values; use default units if unspecified). And assess whether they meet criteria thresholds.\nRelevancy check\n- If no keywords are mentioned => `relevant = false`, `score = 0`, and skip remaining steps.\n- If keywords are mentioned => `relevant = true`, and continue this guideline.\n{{ intention_to_treat }}\nExclusions:\n- Look for exclusions in the clinical note that may explain the symptom, but not SLE itself. These exclusions may justify scoring the descriptor but make the criteria `unfulfilled_diagnostic`.\n- Only count exclusions if they are explicitly written in the note. If not mentioned, assume no exclusions.\n- Drug exclusions only apply if the symptom is a common side effect, or if the doctor suspects the drug caused it.\nIf `relevant = true`, classify the diagnostic criteria as:\n- 'fulfilled' (clear evidence the descriptor is met)\n- 'unfulfilled_negated' (the absence of symptoms/diagnosis is explicitly stated in the clinical note)\n- 'unfulfilled_diagnostic' (not enough evidence)\n- 'uncertain' (doctor is uncertain or diagnostic ambiguity)\nNotes and nuances:\n- Terms such as \"decrease/subsided/less/reduced/improved/similar/no increase in\" still imply current symptom presence\n- '?' or 'vs' indicates physician uncertainty, so criteria should be 'uncertain'\n- Timepoint for Assessment: The reference point for calculating the SLEDAI-2K score is the time of hospital admission. If clinical parameters differ between the emergency department (ED) and admission, use the value documented at admission.\n- Prioritization of findings: Admission documentation takes precedence over earlier ED or HPI mentions. If a descriptor is present in the ED but absent at admission, it should not be scored. Earlier mentions are only considered if no admission documentation exists. For example, a fever noted in the ED but resolved by admission should not contribute to the score.\n- Handling duplicated laboratory tests: If duplicate laboratory tests are identified after admission, only the first result should be considered.\n- If multiple reference ranges exist for the descriptor, check the report date and apply the reference range that corresponds to the time of testing\n- Scan the entire clinical note for all mentions of descriptor keywords. Do not stop at the first mention.\n- If keywords appear in multiple parts of the note, check whether they refer to the same time frame or episode. If yes, evaluate them together. If no, otherwise, evaluate each mention independently.\n- If any independent mention fulfills the criteria, it can support final scoring of the descriptor.\n{{ npsle_tips }}\nAdditional tips:\n- Core lupus drug abbreviations include HCQ (hydroxychloroquine), P/PRED (prednisone), MMF/MPA (mycophenolate), AZA (azathioprine), BEL (belimumab), LEF(Leflunomide), RTX (rituximab), CTX/CYC (cyclophosphamide), TAC/FK506/FK (tacrolimus), and CsA/CYA (cyclosporine).\n- 'P' followed by a number (e.g. P5, P7.5, P20) refers to prescribing and administering oral prednisone at the specified dose in milligrams (mg).\n- The term 'flare' in clinical impressions acts as a diagnostic trigger: it confirms active manifestations fulfilling specific SLEDAI descriptors (e.g. cutaneous flare fulfills lupus rash).\n- In medical documentation, X/52 denotes X weeks and X/12 denotes X months, reflecting durations based on yearly cycles (52 weeks or 12 months).(e.g., 2/52 = 2 weeks, 1/12 = 1 month).\n- The value \"trace\" for test results means +/- (neither positive nor negative)\n\n2. Time frame:\nAfter identifying relevant keywords, symptoms, or test results in the diagnostic assessment, determine how recently the identified entity or finding occurred.\nTime classification should reflect the current status of the symptom as of the documentation date, not when it first began. For example, if the note states 'onset 3 months ago' or '3 months already', it implies the symptom has been present continuously and is still active at the time of admission, so the time is still considered within_10days.\nIf the note explicitly states that the symptom has resolved, then the time should reflect when it was last active.\nDischarge note rules:\n- In the history of present illness section: if timing is not explicitly stated (e.g. \"one week ago\"), classify as time_uncertain.\n- In the emergency department (ED) documentation: unless otherwise specified, classify findings as within_10days\n- At hospital admission (or on the floor): findings are prioritized and should be classified as within_10days.\n\nAssign one of the following categories with respect to the time of admission:\n- 'within_10days' (descriptor is active within the last 10 days)\n- '11_to_30days' (active more than 10 days ago but less than 30 days ago)\n- '30days_ago' (entity was present 30 days ago)\n- 'time_uncertain' (timing of entity cannot be determined)\nTips:\n- Use context from the same part of the note where the descriptor was identified\n- \"recent/frequent/recurrent\" => within_10days\n- \"occasional/sometimes/last visit/last time/on and off\" => time_uncertain\n- if only month and year provided: if match note date => 11_to_30days; otherwise => time_uncertain\nNote that all dates mentioned should follow the format dd/mm/yyyy, unless it doesn't make sense.\nFor time_uncertain or 30days_ago, the descriptor score should be 0.\n\n3. Score calculation:\nDescriptor `score = 1` only if both:\n(1) criteria must be 'fulfilled'\n(2) time is either 'within_10days' or '11_to_30days'\nOutput the score in JSON format.\nInclude:\n- \"confidence_score\": a number from 0 to 10 indicating how confident you are that your predicted score (0 or 1) accurately reflects whether the diagnostic criteria are met, based solely on the information available in the clinical note.\n  - 10 = You are fully confident your prediction is correct, based on clear and direct evidence in the note. This includes explicit confirmation of the criteria (for score 1), explicit negations or absence of relevant keywords (for score 0).\n  - 0 = You have no confidence in your prediction due to ambiguity, conflicting statements, vague language, or missing context in the note.\n  - Scores between 1-9 reflect varying degrees of uncertainty, partial evidence, indirect phrasing, or incomplete documentation.\n  - Note: Your confidence should reflect the clarity and completeness of the clinical note — not the doctor's intent, external medical knowledge, or pending test results. For example:\n    - If the note says \"? alopecia\", you may be highly confident that the physician is uncertain, and therefore confident in assigning score 0.\n    - If a test is mentioned but no result is provided, you may be confident that the criteria are not met, even if the test result is pending.\nYour confidence should reflect how well the note supports your prediction — not whether the criteria are truly met in reality.\n- \"rationale\": a 1-3 sentence explanation of the score. Mention relevant symptoms/signs, tests, any exclusions, time, etc. that helped you conclude this score. Use exact quoted text if citing clinical notes.\n\n\nDiagnostic information for descriptor {{ descriptor }}:\n{{ information }}\n\n{{ keywords }}\n\n==========================================================\nClinical Note:\n{{ clinical_note }}\n\n===================================================\nOutput JSON format:\n```\n{\n    'descriptor': '{{ descriptor }}', // required\n    'relevant': true or false, // required; write true if keywords are mentioned in the clinical note\n    'criteria': 'unfulfilled_negated' | 'unfulfilled_diagnostic' | 'fulfilled' | 'uncertain' | null, // write null if 'relevant' field is false\n    {{ nature_of_intention_to_treat }}'time': 'within_10days' | '11_to_30days' | '30days_ago' | 'time_uncertain' | null, // write null if 'relevant' field is false\n    'score': 0 or 1, // required\n    'confidence_score': 0 to 10, // required\n    'rationale': '' // required\n}\n```\n"
+  },
+  "additional_prompts": {
+    "treatment_response_prompt": "- Treatment response: For cases of {{ descriptor }} where documented positive symptoms/signs/tests do not fully meet diagnostic thresholds, criteria could be fulfilled if either:\n(a) a documented positive response to lupus-directed therapeutic trials (e.g. steroids, antimalarials, immunosuppressants, or biologics), or\n(b) doctor's stated intention to initiate or escalate lupus-directed treatment.\nException: Rash that improves with steroids alone is insufficient to establish lupus etiology.\n",
+    "intention_to_treat_prompt": "- Intention to treat: The doctor's treatment plans must include the initiation or escalation of steroids (e.g. prednisone, prednisolone, glucocorticoids), immunosuppressants (e.g. mycophenolate mofetil, cyclophosphamide, azathioprine, cyclosporine, tacrolimus), or biologics (e.g. belimumab, rituximab).\nClassify the nature_of_intention_to_treat:\n- 'treat_escalated' (lupus-specific treatment is initiated or escalated)\n- 'treat_de_escalate' (treatment is reduced, tapered, or discontinued)\n- 'wait_and_see' (no treatment change is made; intent is to monitor and reassess)\nImportant: If diagnostic keywords are mentioned or the diagnostic criteria are met, but `nature_of_intention_to_treat` is not treat_escalated, then the criteria should be considered unfulfilled_diagnostic (see below).\n",
+    "nature_of_intention_to_treat_prompt": "'nature_of_intention_to_treat': 'treat_escalated' | 'wait_and_see' | 'treat_de_escalate' | null, // write null only if 'relevant' field is false\n",
+    "npsle_tips": "- Terms such as \"NPSLE,\" \"CNS lupus,\" and \"lupus cerebritis\" are non-specific and can correspond to several distinct neuropsychiatric items in the SLEDAI-2K (e.g., Seizures, Psychosis, Organic Brain Syndrome, CVA). Therefore, when these keywords are present, the first step is to determine if a specific type of NPSLE was documented by the physician to assign the correct SLEDAI-2K item. When the clinical notes are ambiguous, a careful review is essential to differentiate between overlapping manifestations, such as psychosis versus organic brain syndrome, or cranial nerve disorder versus stroke.\n"
+  },
+  "descriptor_types": {
+    "seizure": "TYPE_A",
+    "psychosis": "TYPE_A",
+    "organic_brain_syndrome": "TYPE_A",
+    "visual_disturbance": "TYPE_A",
+    "cranial_nerve_disorder": "TYPE_A",
+    "lupus_headache": "TYPE_A",
+    "CVA": "TYPE_A",
+    "vasculitis": "TYPE_A",
+    "arthritis": "TYPE_A",
+    "myositis": "TYPE_A",
+    "urinary_casts": "TYPE_B",
+    "hematuria": "TYPE_B",
+    "proteinuria": "TYPE_B",
+    "pyuria": "TYPE_B",
+    "rash": "TYPE_A",
+    "alopecia": "TYPE_A",
+    "mucosal_ulcers": "TYPE_A",
+    "pleurisy": "TYPE_A",
+    "pericarditis": "TYPE_A",
+    "low_complement": "TYPE_B",
+    "increased_DNA_binding": "TYPE_B",
+    "fever": "TYPE_A",
+    "thrombocytopenia": "TYPE_B",
+    "leukopenia": "TYPE_B"
+  },
+  "scores": {
+    "seizure": 8,
+    "psychosis": 8,
+    "organic_brain_syndrome": 8,
+    "visual_disturbance": 8,
+    "cranial_nerve_disorder": 8,
+    "lupus_headache": 8,
+    "CVA": 8,
+    "vasculitis": 8,
+    "arthritis": 4,
+    "myositis": 4,
+    "urinary_casts": 4,
+    "hematuria": 4,
+    "proteinuria": 4,
+    "pyuria": 4,
+    "rash": 2,
+    "alopecia": 2,
+    "mucosal_ulcers": 2,
+    "pleurisy": 2,
+    "pericarditis": 2,
+    "low_complement": 2,
+    "increased_DNA_binding": 2,
+    "fever": 1,
+    "thrombocytopenia": 1,
+    "leukopenia": 1
+  },
+  "type_a_hard": [
+    "seizure",
+    "psychosis",
+    "organic_brain_syndrome",
+    "visual_disturbance",
+    "cranial_nerve_disorder",
+    "lupus_headache",
+    "CVA",
+    "vasculitis"
+  ]
+}
