@@ -117,14 +117,11 @@ async function loadPrompts() {
         templates = data.templates;
         additionalPrompts = data.additional_prompts || {};
         typeAHard = data.type_a_hard || [];
-        
-        const countElement = safeGetElement('descriptorCount');
-        if (countElement) countElement.textContent = `(${weights.length})`;
-        
+
         renderDescriptorList();
         
         if (weights.length > 0) {
-            selectDescriptor(weights[0][0]);
+            selectDescriptor(weights[0][0], false);
         }
     } catch (error) {
         console.error('Error:', error);
@@ -141,13 +138,15 @@ function renderDescriptorList() {
     
     container.innerHTML = descriptors.map(desc => `
         <div class="descriptor-item ${descriptorTypes[desc] === 'TYPE_A' ? 'type-a' : 'type-b'} ${currentDescriptor === desc ? 'active' : ''}" data-descriptor="${desc}">
-            <strong>${formatName(desc)}</strong>
-            <small>Score: ${descriptorScores[desc]} | ${descriptorTypes[desc] === 'TYPE_A' ? 'Clinical' : 'Lab'}</small>
+            <div class="descriptor-header">
+                <strong>${formatName(desc)}</strong>
+                <span class="descriptor-meta">Weight: ${descriptorScores[desc]} | ${descriptorTypes[desc] === 'TYPE_A' ? 'Clinical' : 'Lab'}</span>
+            </div>
         </div>
     `).join('');
     
     document.querySelectorAll('.descriptor-item').forEach(el => {
-        el.addEventListener('click', () => selectDescriptor(el.dataset.descriptor));
+        el.addEventListener('click', () => selectDescriptor(el.dataset.descriptor, true));
     });
 }
 
@@ -175,6 +174,23 @@ function buildKeywordsText(desc) {
         }
     }
     return keywordsText;
+}
+
+// Auto-scroll to descriptor title card with offset for navbar
+function scrollToDescriptorEditor() {
+    const titleCard = document.querySelector('#descriptorEditor .main-card-header');
+    if (!titleCard) return;
+    
+    const navbar = document.querySelector('.navbar');
+    const navbarHeight = navbar ? navbar.offsetHeight : 64;
+    
+    const elementPosition = titleCard.getBoundingClientRect().top;
+    const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - 16;
+    
+    window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+    });
 }
 
 // Add threshold row function
@@ -217,7 +233,7 @@ function addThresholdRow(dateRange = '', condition = '<', value = '', units = ''
     });
 }
 
-function selectDescriptor(desc) {
+function selectDescriptor(desc, fromUserClick = false) {
     currentDescriptor = desc;
     renderDescriptorList();
     
@@ -226,7 +242,7 @@ function selectDescriptor(desc) {
     
     const titleElement = safeGetElement('currentDescriptorTitle');
     if (titleElement) {
-        titleElement.innerHTML = `${formatName(desc)} <span style="font-size:0.7rem; opacity:0.7;">Score: ${descriptorScores[desc]}</span>`;
+        titleElement.innerHTML = `${formatName(desc)} <span style="font-size:0.7rem; opacity:0.7;">Weight: ${descriptorScores[desc]}</span>`;
     }
     
     const isTypeB = descriptorTypes[desc] === 'TYPE_B';
@@ -293,6 +309,10 @@ function selectDescriptor(desc) {
     const rulesEditor = safeGetElement('rulesEditor');
     if (rulesEditor) rulesEditor.value = rulesText;
     generateOutput();
+    
+    if (fromUserClick) {
+        scrollToDescriptorEditor();
+    }
 }
 
 function updateRawFromStructured() {
@@ -374,7 +394,7 @@ function resetToDefault() {
     
     const rulesEditor = safeGetElement('rulesEditor');
     if (rulesEditor) rulesEditor.value = defaultRules;
-    selectDescriptor(currentDescriptor);
+    selectDescriptor(currentDescriptor, false);
     generateOutput();
     showToast(`Reset ${formatName(currentDescriptor)} to default`, 'success');
 }
@@ -458,7 +478,7 @@ function buildFullPrompt(noteType, descriptor, customRules) {
 
 function buildDescriptorOnly(descriptor, customRules) {
     return `# Descriptor: ${descriptor}
-# SLEDAI-2K Score: ${descriptorScores[descriptor]}
+# SLEDAI-2K Weight: ${descriptorScores[descriptor]}
 # Type: ${descriptorTypes[descriptor] === 'TYPE_A' ? 'Clinical' : 'Laboratory'}
 
 '${descriptor}': '''${customRules}

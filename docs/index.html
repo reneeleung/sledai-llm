@@ -32,6 +32,12 @@
                 </div>
                 <div class="sidebar-card-body config-body">
                     <div class="config-option">
+                        <button id="editTemplateBtn" class="btn-text" style="width: 100%; text-align: center; padding: 8px; margin-top: 8px;">
+                            ✏️ Edit Prompt Templates (General Guidelines)
+                        </button>
+                    </div>
+
+                    <div class="config-option">
                         <label class="config-label">Note Type</label>
                         <div class="config-select">
                             <select id="noteTypeSelect">
@@ -51,11 +57,6 @@
                         </div>
                     </div>
 
-                    <div class="config-option">
-                        <button id="editTemplateBtn" class="btn-text" style="width: 100%; text-align: center; padding: 8px; margin-top: 8px;">
-                            ✏️ Edit Prompt Templates (General Guidelines)
-                        </button>
-                    </div>
                 </div>
             </div>
 
@@ -63,7 +64,7 @@
             <div class="sidebar-card">
                 <div class="sidebar-card-header">
                     <span>🔍</span>
-                    <h3>Descriptors <span id="descriptorCount"></span></h3>
+                    <h3>Descriptors</h3>
                 </div>
                 <div class="search-box">
                     <input type="text" id="descriptorSearch" placeholder="Search descriptors...">
@@ -99,19 +100,19 @@
                         <div class="editor-section">
                             <label class="editor-label">Exclusion Criteria</label>
                             <textarea id="clinicalExclusions" class="editor-textarea" rows="2" 
-                                      placeholder="What to exclude?"></textarea>
+                                      placeholder="e.g., Exclude drug causes, infection, other causes, etc."></textarea>
                         </div>
                         
                         <div class="editor-section">
                             <label class="editor-label">Additional Notes / Remarks</label>
                             <textarea id="clinicalNotes" class="editor-textarea" rows="3" 
-                                      placeholder="Important notes, threshold details, special instructions..."></textarea>
+                                      placeholder="Any special instructions or additional requirements..."></textarea>
                         </div>
                         
                         <div class="editor-section">
                             <label class="editor-label">Keywords to Look For</label>
                             <textarea id="keywords" class="editor-textarea" rows="2" 
-                                      placeholder="Relevant keywords..."></textarea>
+                                      placeholder="Relevant keywords (diagnostic, symptoms/signs, paraclinical tests)..."></textarea>
                         </div>
                     </div>
                     
@@ -148,14 +149,14 @@
                         <div class="editor-section">
                             <label class="editor-label">Exclusion Criteria</label>
                             <textarea id="exclusionCriteria" class="editor-textarea" rows="3" 
-                                    placeholder="e.g., Exclude drug causes, infection, portal hypertension, stones, menstruation"></textarea>
+                                    placeholder="e.g., Exclude drug causes, infection, other causes, etc."></textarea>
                         </div>
                         
                         <!-- Additional Notes -->
                         <div class="editor-section">
                             <label class="editor-label">Additional Notes / Remarks</label>
                             <textarea id="labNotes" class="editor-textarea" rows="4" 
-                                    placeholder="Any special instructions, methodology notes, exceptions, or additional requirements..."></textarea>
+                                    placeholder="Any special instructions or additional requirements..."></textarea>
                         </div>
 
                         <!-- Keywords to Look For (for Type B) -->
@@ -229,7 +230,7 @@
                 <div class="placeholder-legend">
                     <span>💡 Click on any <code class="placeholder-highlight">{{ placeholder }}</code> in the template below to edit its content:</span>
                     <ul class="legend-list">
-                        <li><code>{{ treatment_logic }}</code> → <strong>Treatment Response</strong> (for low-score descriptors, score &lt; 8) <strong>OR</strong> <strong>Intention to Treat</strong> (for high-score descriptors, score ≥ 8)</li>
+                        <li><code>{{ treatment_logic }}</code> → <strong>Treatment Response</strong> (for low-weight descriptors, weight &lt; 8) <strong>OR</strong> <strong>Intention to Treat</strong> (for high-weight descriptors, weight ≥ 8)</li>
                         <li><code>{{ npsle_tips }}</code> → <strong>NPSLE Tips</strong> (for neuropsychiatric descriptors)</li>
                     </ul>
                 </div>
@@ -256,25 +257,25 @@
                 <div class="alert alert-info" style="margin-bottom: 20px;">
                     The treatment_logic placeholder inserts different prompts based on descriptor type:
                     <ul style="margin-top: 8px; margin-left: 20px; font-size: 0.8rem;">
-                        <li><strong>Low-score descriptors (score &lt; 8):</strong> Uses "Treatment Response" prompt</li>
-                        <li><strong>High-score descriptors (score ≥ 8):</strong> Uses "Intention to Treat" prompt</li>
+                        <li><strong>Low-weight descriptors (weight &lt; 8):</strong> Uses "Treatment Response" prompt</li>
+                        <li><strong>High-weight descriptors (weight ≥ 8):</strong> Uses "Intention to Treat" prompt</li>
                     </ul>
                 </div>
                 
-                <!-- Treatment Response Prompt (for low-score descriptors) -->
+                <!-- Treatment Response Prompt (for low-weight descriptors) -->
                 <div class="editor-section" style="background: var(--bg); padding: 16px; border-radius: 12px; margin-bottom: 20px;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                        <span class="badge" style="background: #10b981;">Score &lt; 8</span>
+                        <span class="badge" style="background: #10b981;">Weight &lt; 8</span>
                         <label class="editor-label" style="margin-bottom: 0;">Treatment Response Prompt</label>
                     </div>
                     <textarea id="treatmentResponseEditor" class="template-editor" rows="6" placeholder="Treatment response prompt..."></textarea>
                     <small class="help-text">Used for: arthritis, myositis, rash, alopecia, mucosal ulcers, pleurisy, pericarditis, low_complement, increased_DNA_binding, fever, thrombocytopenia, leukopenia</small>
                 </div>
                 
-                <!-- Intention to Treat Prompt (for high-score descriptors) -->
+                <!-- Intention to Treat Prompt (for high-weight descriptors) -->
                 <div class="editor-section" style="background: var(--bg); padding: 16px; border-radius: 12px;">
                     <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-                        <span class="badge" style="background: #f59e0b;">Score ≥ 8</span>
+                        <span class="badge" style="background: #f59e0b;">Weight ≥ 8</span>
                         <label class="editor-label" style="margin-bottom: 0;">Intention to Treat Prompt</label>
                     </div>
                     <textarea id="intentionToTreatEditor" class="template-editor" rows="6" placeholder="Intention to treat prompt..."></textarea>

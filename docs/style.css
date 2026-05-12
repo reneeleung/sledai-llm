@@ -235,14 +235,18 @@ body {
     padding: 8px;
     max-height: 500px;
     overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
 }
 
 .descriptor-item {
-    padding: 12px;
+    padding: 8px 12px;
     border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 4px;
+    transition: all 0.15s ease;
+    border: 1px solid transparent;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .descriptor-item.type-a {
@@ -255,45 +259,70 @@ body {
     border-left: 3px solid var(--type-b-border);
 }
 
-.descriptor-item.type-a:hover,
-.descriptor-item.type-b:hover {
-    background: var(--hover-bg);
+/* Hover effect for unselected items - subtle background change */
+.descriptor-item.type-a:hover:not(.active) {
+    background: #e8e6f5;
+    transform: translateX(2px);
+}
+
+.descriptor-item.type-b:hover:not(.active) {
+    background: #e2eef9;
+    transform: translateX(2px);
+}
+
+/* Selected item - subtle hover effect (just slight brightness change) */
+.descriptor-item.active:hover {
+    filter: brightness(0.97);
+    transform: translateX(2px);
 }
 
 .descriptor-item.active {
     background: var(--selected-bg);
     color: var(--selected-text);
     border-left-color: var(--selected-text);
+    box-shadow: var(--shadow-sm);
 }
 
-.descriptor-item.active.type-a,
-.descriptor-item.active.type-b {
-    background: var(--selected-bg);
+.descriptor-item .descriptor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
 }
 
 .descriptor-item strong {
-    display: block;
     font-size: 0.85rem;
     font-weight: 600;
-    margin-bottom: 4px;
+    line-height: 1.4;
+    flex: 1;
+    word-break: break-word;
 }
 
-.descriptor-item small {
+.descriptor-item .descriptor-meta {
     font-size: 0.65rem;
-    opacity: 0.8;
+    font-weight: 400;
+    font-family: inherit;
+    white-space: nowrap;
+    flex-shrink: 0;
+    opacity: 0.6;
 }
 
-.descriptor-item.type-a small {
+.descriptor-item.type-a .descriptor-meta {
     color: var(--type-a-text);
 }
 
-.descriptor-item.type-b small {
+.descriptor-item.type-b .descriptor-meta {
     color: var(--type-b-text);
 }
 
-.descriptor-item.active strong,
-.descriptor-item.active small {
+.descriptor-item.active .descriptor-meta {
     color: var(--selected-text);
+    opacity: 0.75;
+}
+
+/* Remove the click flash/scale effect */
+.descriptor-item:active {
+    transform: scale(0.99);
 }
 
 /* Main Content */
