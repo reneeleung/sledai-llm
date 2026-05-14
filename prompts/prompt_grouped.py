@@ -122,13 +122,3 @@ Output JSON format:
 ]
 ```
 '''
-output_template_basic = '''===================================================
-Output JSON format:
-```
-{
-    '{ descriptor1 }': 0 or 1, // required
-    '{ descriptor2 }': 0 or 1, // required
-    // add more descriptors
-},
-```
-'''

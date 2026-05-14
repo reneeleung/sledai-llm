@@ -1,5 +1,3 @@
-## Run save_prompts.py whenever there are new changes to this file
-
 TYPE_A = 'type_a'
 TYPE_B = 'type_b'
 

@@ -4,12 +4,14 @@ let weights = [];
 let descriptorTypes = {};
 let descriptorScores = {};
 let keywordsList = {};
-let templates = { outpatient: '', discharge: '' };
+let originalKeywordsList = {};
+let templates = { outpatient: '', inpatient: '' };
 let currentDescriptor = null;
 let thresholdRowCounter = 0;
 let additionalPrompts = {};
 let typeAHard = [];
 let currentEditingTemplate = 'outpatient';
+let customRules = {};
 
 // Helper function to safely get element
 function safeGetElement(id) {
@@ -80,7 +82,7 @@ function buildRulesTextFromStructured(descriptorData, isTypeB) {
     if (descriptorData.thresholds && descriptorData.thresholds.length > 0) {
         rulesText += `Quantitative thresholds:\n`;
         descriptorData.thresholds.forEach(t => {
-            rulesText += `- ${t.date_range}: ${t.condition} ${t.value} ${t.units}\n`;
+            rulesText += `- ${t.date_range} ${t.condition} ${t.value} ${t.units}\n`;
         });
         rulesText += `\n`;
     }
@@ -114,7 +116,10 @@ async function loadPrompts() {
         descriptorTypes = data.descriptor_types;
         descriptorScores = data.scores;
         keywordsList = data.keywords_list;
-        templates = data.templates;
+        originalKeywordsList = JSON.parse(JSON.stringify(keywordsList));
+
+        editableTemplates = data.editable_templates || {};
+        nonEditableTemplates = data.non_editable_templates || {};
         additionalPrompts = data.additional_prompts || {};
         typeAHard = data.type_a_hard || [];
 
@@ -203,7 +208,7 @@ function addThresholdRow(dateRange = '', condition = '<', value = '', units = ''
     row.className = 'threshold-row';
     row.innerHTML = `
         <div class="threshold-date">
-            <input type="text" placeholder="e.g., Always, After 2020-01-01, Before 2018-12-24, C3, C4" value="${escapeHtml(dateRange)}">
+            <input type="text" placeholder="Biomarkers (e.g. C3, C4)" value="${escapeHtml(dateRange)}">
         </div>
         <div class="threshold-value-row">
             <div class="threshold-condition">
@@ -219,7 +224,7 @@ function addThresholdRow(dateRange = '', condition = '<', value = '', units = ''
                 <input type="text" placeholder="Value" value="${escapeHtml(value)}">
             </div>
             <div class="threshold-units">
-                <input type="text" placeholder="Units" value="${escapeHtml(units)}">
+                <input type="text" placeholder="Unit" value="${escapeHtml(units)}">
             </div>
         </div>
         <div class="threshold-remove">
@@ -233,6 +238,7 @@ function addThresholdRow(dateRange = '', condition = '<', value = '', units = ''
     });
 }
 
+// Update selectDescriptor to load saved rules
 function selectDescriptor(desc, fromUserClick = false) {
     currentDescriptor = desc;
     renderDescriptorList();
@@ -242,15 +248,22 @@ function selectDescriptor(desc, fromUserClick = false) {
     
     const titleElement = safeGetElement('currentDescriptorTitle');
     if (titleElement) {
-        titleElement.innerHTML = `${formatName(desc)} <span style="font-size:0.7rem; opacity:0.7;">Weight: ${descriptorScores[desc]}</span>`;
+        titleElement.innerHTML = `${formatName(desc)} <span style="font-size:0.7rem; opacity:0.7;">Score: ${descriptorScores[desc]}</span>`;
     }
     
     const isTypeB = descriptorTypes[desc] === 'TYPE_B';
     const descriptorData = definitions[desc];
+    
+    // Load saved custom rules or use default
     let rulesText = '';
     let structuredData = null;
     
-    if (typeof descriptorData === 'string') {
+    if (customRules[desc]) {
+        rulesText = customRules[desc];
+        if (isTypeB && (rulesText.includes('Quantitative thresholds:') || rulesText.includes('Qualitative value handling:'))) {
+            structuredData = parseStructuredFromText(rulesText);
+        }
+    } else if (typeof descriptorData === 'string') {
         rulesText = descriptorData;
         if (isTypeB && (rulesText.includes('Quantitative thresholds:') || rulesText.includes('Qualitative value handling:'))) {
             structuredData = parseStructuredFromText(rulesText);
@@ -258,6 +271,9 @@ function selectDescriptor(desc, fromUserClick = false) {
     } else if (typeof descriptorData === 'object') {
         structuredData = descriptorData;
         rulesText = buildRulesTextFromStructured(descriptorData, isTypeB);
+        if (isTypeB && !customRules[desc]) {
+            customRules[desc] = rulesText;
+        }
     }
     
     const parsed = parseRulesText(rulesText);
@@ -306,8 +322,9 @@ function selectDescriptor(desc, fromUserClick = false) {
         if (keywords) keywords.value = buildKeywordsText(currentDescriptor).replace(/\n/g, '\n');
     }
     
-    const rulesEditor = safeGetElement('rulesEditor');
-    if (rulesEditor) rulesEditor.value = rulesText;
+    // Update the preview (read-only)
+    const rulesPreview = safeGetElement('rulesPreview');
+    if (rulesPreview) rulesPreview.value = rulesText;
     generateOutput();
     
     if (fromUserClick) {
@@ -315,6 +332,7 @@ function selectDescriptor(desc, fromUserClick = false) {
     }
 }
 
+// Update updateRawFromStructured to save changes
 function updateRawFromStructured() {
     if (!currentDescriptor) return;
     
@@ -365,23 +383,197 @@ function updateRawFromStructured() {
         const diagnosticCriteria = safeGetElement('diagnosticCriteria');
         const clinicalExclusions = safeGetElement('clinicalExclusions');
         const clinicalNotes = safeGetElement('clinicalNotes');
+        const keywords = safeGetElement('keywords');
         
         const criteria = diagnosticCriteria ? diagnosticCriteria.value : '';
         const exclusions = clinicalExclusions ? clinicalExclusions.value : '';
         const notes = clinicalNotes ? clinicalNotes.value : '';
+        const keywordsValue = keywords ? keywords.value : '';
         
         newRules = `Diagnostic criteria:\n${criteria}`;
         if (exclusions) newRules += `\n\nExclusions:\n${exclusions}`;
         if (notes) newRules += `\n\nNotes:\n${notes}`;
+        
+        // Parse keywords text to extract diagnostic, symptoms, paraclinical
+        if (keywordsValue && currentDescriptor) {
+            if (!keywordsList[currentDescriptor]) keywordsList[currentDescriptor] = {};
+            
+            // Clear existing
+            delete keywordsList[currentDescriptor].diagnostic;
+            delete keywordsList[currentDescriptor].symptoms;
+            delete keywordsList[currentDescriptor].paraclinical;
+            
+            // Parse based on headers
+            const diagnosticMatch = keywordsValue.match(/List of diagnostic keywords:\n([\s\S]*?)(?=\n\nList of|$)/i);
+            const symptomsMatch = keywordsValue.match(/List of symptoms\/signs keywords:\n([\s\S]*?)(?=\n\nList of|$)/i);
+            const paraclinicalMatch = keywordsValue.match(/List of paraclinical keywords:\n([\s\S]*?)(?=\n\nList of|$)/i);
+            
+            if (diagnosticMatch) {
+                let diagText = diagnosticMatch[1].trim();
+                // Remove any "No diagnostic keywords." line if present
+                if (diagText === 'No diagnostic keywords.' || diagText.startsWith('No diagnostic keywords')) {
+                    // Don't store anything for diagnostic
+                } else {
+                    keywordsList[currentDescriptor].diagnostic = diagText;
+                }
+            }
+            
+            if (symptomsMatch) {
+                let symptomsText = symptomsMatch[1].trim();
+                if (symptomsText && !symptomsText.startsWith('No')) {
+                    keywordsList[currentDescriptor].symptoms = symptomsText;
+                }
+            }
+            
+            if (paraclinicalMatch) {
+                let paraText = paraclinicalMatch[1].trim();
+                if (paraText && !paraText.startsWith('No')) {
+                    keywordsList[currentDescriptor].paraclinical = paraText;
+                }
+            }
+            
+            // If no headers found at all, assume whole text is diagnostic
+            if (!diagnosticMatch && !symptomsMatch && !paraclinicalMatch && keywordsValue.trim()) {
+                if (keywordsValue.trim() !== 'No diagnostic keywords.') {
+                    keywordsList[currentDescriptor].diagnostic = keywordsValue.trim();
+                }
+            }
+        }
     }
     
-    const rulesEditor = safeGetElement('rulesEditor');
-    if (rulesEditor) rulesEditor.value = newRules;
+    // Update the preview (read-only)
+    const rulesPreview = safeGetElement('rulesPreview');
+    if (rulesPreview) {
+        rulesPreview.value = newRules;
+    }
+    
+    customRules[currentDescriptor] = newRules;
+    
     generateOutput();
+}
+
+function updateDownloadButtonText() {
+    const noteTypeSelect = safeGetElement('noteTypeSelect');
+    const downloadBtn = safeGetElement('downloadPromptBtn');
+    if (noteTypeSelect && downloadBtn) {
+        const isOutpatient = noteTypeSelect.value === 'outpatient';
+        downloadBtn.textContent = isOutpatient ? '📥 Download prompt.py (Outpatient)' : '📥 Download prompt.py (Inpatient)';
+    }
+}
+
+// Add download prompt.py function
+function downloadPromptPy() {
+    const noteTypeSelect = safeGetElement('noteTypeSelect');
+    const currentNoteType = noteTypeSelect ? noteTypeSelect.value : 'outpatient';
+    const isOutpatient = currentNoteType === 'outpatient';
+    
+    let content = `# SLEDAI-2K Prompt Configuration - ${isOutpatient ? 'OUTPATIENT' : 'INPATIENT'}\n`;
+    content += `# Generated from SLEDAI-2K Prompt Customizer\n# Note Type: ${isOutpatient ? 'Outpatient (assess at visit date)' : 'Inpatient/Discharge (assess at admission date)'}\n\n`;
+    
+    // Add type constants
+    content += "TYPE_A = 'type_a'\n";
+    content += "TYPE_B = 'type_b'\n\n";
+
+    // Add weights
+    content += 'weights = [\n';
+    weights.forEach(w => {
+        content += `    ('${w[0]}', ${w[1]}, ${w[2].toUpperCase()}),\n`;
+    });
+    content += ']\n\n';
+
+    // Add descriptors list and derived variables
+    content += 'descriptors = [w[0] for w in weights]\n';
+    content += 'sledai_weights = {w[0]: w[1] for w in weights}\n';
+    content += 'type_a_hard = [w[0] for w in weights if w[1] >= 8]\n';
+    content += 'type_a_others = [w[0] for w in weights if w[2] == TYPE_A and w[0] not in type_a_hard]\n';
+    content += 'type_b = [w[0] for w in weights if w[2] == TYPE_B]\n\n';
+    
+    // Add additional prompts
+    content += 'treatment_response_prompt = """' + (additionalPrompts.treatment_response_prompt || '') + '"""\n\n';
+    content += 'intention_to_treat_prompt = """' + (additionalPrompts.intention_to_treat_prompt || '') + '"""\n\n';
+    content += 'nature_of_intention_to_treat_prompt = """' + (additionalPrompts.nature_of_intention_to_treat_prompt || '') + '"""\n\n';
+    content += 'npsle_tips = """' + (additionalPrompts.npsle_tips || '') + '"""\n\n';
+    
+    // Add editable guidelines templates
+    const guidelinesKey = isOutpatient ? 'outpatient_guidelines' : 'inpatient_guidelines';
+    content += '# Editable Guidelines Templates\n';
+    content += 'guidelines_template = """\n' + (editableTemplates[guidelinesKey] || '') + '\n"""\n\n';
+    
+    // Add clinical note template
+    const clinicalNoteKey = isOutpatient ? 'outpatient_clinical_note' : 'inpatient_clinical_note';
+    content += '# Clinical Note Template\n';
+    content += 'clinical_note_template = """' + (nonEditableTemplates[clinicalNoteKey] || '') + '"""\n\n';
+    
+    // Add combined score template
+    content += '# Combined Score Template\n';
+    content += 'score_template = guidelines_template + clinical_note_template\n\n';
+    
+    // Add output template
+    content += '# Output Template (for JSON formatting)\n';
+    content += 'output_template = """' + (nonEditableTemplates.output_template || '') + '"""\n\n';
+    
+    // Add keywords_list
+    content += 'keywords_list = {\n';
+    for (const [desc, keywords] of Object.entries(keywordsList)) {
+        content += `    '${desc}': {\n`;
+        if (descriptorTypes[desc] === 'TYPE_A') {
+            // Type A has diagnostic, symptoms, paraclinical
+            const diagnostic = keywords.diagnostic || '';
+            const symptoms = keywords.symptoms || '';
+            const paraclinical = keywords.paraclinical || '';
+            if (diagnostic) content += `        'diagnostic': '''${diagnostic.replace(/'/g, "\\'")}''',\n`;
+            if (symptoms) content += `        'symptoms': '''${symptoms.replace(/'/g, "\\'")}''',\n`;
+            if (paraclinical) content += `        'paraclinical': '''${paraclinical.replace(/'/g, "\\'")}''',\n`;
+        } else {
+            // Type B has keywords
+            const kw = keywords.keywords || '';
+            if (kw) content += `        'keywords': '''${kw.replace(/'/g, "\\'")}''',\n`;
+        }
+        content += `    },\n`;
+    }
+    content += '}\n\n';
+
+    // Add descriptor definitions
+    content += 'definitions = {\n';
+    for (const [desc, descriptorData] of Object.entries(definitions)) {
+        let rulesText;
+        const savedRule = customRules[desc];
+        
+        if (savedRule) {
+            rulesText = savedRule;
+        } else if (typeof descriptorData === 'string') {
+            rulesText = descriptorData;
+        } else if (typeof descriptorData === 'object') {
+            rulesText = buildRulesTextFromStructured(descriptorData, descriptorTypes[desc] === 'TYPE_B');
+        } else {
+            rulesText = '';
+        }
+        
+        const escapedRules = rulesText.replace(/'''/g, "\\'\\'\\'");
+        content += `    '${desc}': '''${escapedRules}\n''',\n\n`;
+    }
+    content += '}\n';
+    
+    // Create download
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'prompt.py';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast(`${isOutpatient ? 'Outpatient' : 'Inpatient'} prompt.py downloaded successfully!`, 'success');
 }
 
 function resetToDefault() {
     if (!currentDescriptor) return;
+
+    if (customRules[currentDescriptor]) {
+        delete customRules[currentDescriptor];
+    }
+
     const descriptorData = definitions[currentDescriptor];
     const isTypeB = descriptorTypes[currentDescriptor] === 'TYPE_B';
     let defaultRules = '';
@@ -392,9 +584,52 @@ function resetToDefault() {
         defaultRules = buildRulesTextFromStructured(descriptorData, isTypeB);
     }
     
-    const rulesEditor = safeGetElement('rulesEditor');
-    if (rulesEditor) rulesEditor.value = defaultRules;
+    // Update preview
+    const rulesPreview = safeGetElement('rulesPreview');
+    if (rulesPreview) rulesPreview.value = defaultRules;
+    
+    if (isTypeB) {
+        const typeBKeywords = safeGetElement('typeBKeywords');
+        if (typeBKeywords) {
+            const originalKeywords = originalKeywordsList[currentDescriptor]?.keywords || '';
+            typeBKeywords.value = originalKeywords;
+            if (!keywordsList[currentDescriptor]) keywordsList[currentDescriptor] = {};
+            keywordsList[currentDescriptor].keywords = originalKeywords;
+        }
+    } else {
+        const keywords = safeGetElement('keywords');
+        if (keywords) {
+            const originalKw = originalKeywordsList[currentDescriptor] || {};
+            let keywordsText = '';
+            if (originalKw.diagnostic) keywordsText += 'List of diagnostic keywords:\n' + originalKw.diagnostic;
+            if (originalKw.symptoms) keywordsText += (keywordsText ? '\n\n' : '') + 'List of symptoms/signs keywords:\n' + originalKw.symptoms;
+            if (originalKw.paraclinical) keywordsText += (keywordsText ? '\n\n' : '') + 'List of paraclinical keywords:\n' + originalKw.paraclinical;
+            if (!keywordsText) keywordsText = 'No diagnostic keywords.';
+            
+            keywords.value = keywordsText;
+            
+            // Restore the keywordsList
+            keywordsList[currentDescriptor] = {
+                diagnostic: originalKw.diagnostic || '',
+                symptoms: originalKw.symptoms || '',
+                paraclinical: originalKw.paraclinical || ''
+            };
+        }
+    }
+    
+    if (!isTypeB) {
+        const diagnosticCriteria = safeGetElement('diagnosticCriteria');
+        const clinicalExclusions = safeGetElement('clinicalExclusions');
+        const clinicalNotes = safeGetElement('clinicalNotes');
+        
+        const parsed = parseRulesText(defaultRules);
+        if (diagnosticCriteria) diagnosticCriteria.value = parsed.criteria;
+        if (clinicalExclusions) clinicalExclusions.value = parsed.exclusions;
+        if (clinicalNotes) clinicalNotes.value = parsed.notes;
+    }
+    
     selectDescriptor(currentDescriptor, false);
+    
     generateOutput();
     showToast(`Reset ${formatName(currentDescriptor)} to default`, 'success');
 }
@@ -410,16 +645,12 @@ function generateOutput() {
     if (!currentDescriptor) return;
     
     const noteTypeSelect = safeGetElement('noteTypeSelect');
-    const outputModeSelect = safeGetElement('outputModeSelect');
-    const rulesEditor = safeGetElement('rulesEditor');
+    const rulesPreview = safeGetElement('rulesPreview');
     
     const noteType = noteTypeSelect ? noteTypeSelect.value : 'outpatient';
-    const outputMode = outputModeSelect ? outputModeSelect.value : 'full';
-    const customRules = rulesEditor ? rulesEditor.value : '';
+    const customRulesContent = rulesPreview ? rulesPreview.value : '';
     
-    const output = outputMode === 'full' 
-        ? buildFullPrompt(noteType, currentDescriptor, customRules)
-        : buildDescriptorOnly(currentDescriptor, customRules);
+    const output = buildFullPrompt(noteType, currentDescriptor, customRulesContent);
     
     const outputContent = safeGetElement('outputContent');
     if (outputContent) outputContent.textContent = output;
@@ -435,54 +666,52 @@ function buildFullPrompt(noteType, descriptor, customRules) {
     }
     
     let dateString = '';
-    let template = '';
+    let guidelinesTemplate = '';
+    let clinicalNoteTemplate = '';
+    let outputTemplate = nonEditableTemplates.output_template;
     
     if (noteType === 'outpatient') {
         dateString = formatDate(assessmentDate ? assessmentDate.value : '');
-        template = templates.outpatient;
+        guidelinesTemplate = editableTemplates.outpatient_guidelines;
+        clinicalNoteTemplate = nonEditableTemplates.outpatient_clinical_note;
     } else {
-        dateString = '[ADMISSION DATE FROM NOTE]';
-        template = templates.discharge;
+        guidelinesTemplate = editableTemplates.inpatient_guidelines;
+        clinicalNoteTemplate = nonEditableTemplates.inpatient_clinical_note;
     }
     
     const keywordsText = buildKeywordsText(descriptor);
     const isHardDescriptor = typeAHard.includes(descriptor);
     
-    let intentionToTreatText = '';
+    let treatmentLogicText = '';
     let natureOfIntentionToTreatText = '';
     let npsleTipsText = '';
     
     if (isHardDescriptor) {
-        intentionToTreatText = additionalPrompts.intention_to_treat_prompt || '';
+        treatmentLogicText = additionalPrompts.intention_to_treat_prompt || '';
+        treatmentLogicText = treatmentLogicText.replace(/\{\{\s*descriptor\s*\}\}/g, formatName(descriptor));
         natureOfIntentionToTreatText = additionalPrompts.nature_of_intention_to_treat_prompt || '';
         npsleTipsText = additionalPrompts.npsle_tips || '';
     } else {
-        intentionToTreatText = additionalPrompts.treatment_response_prompt || '';
-        intentionToTreatText = intentionToTreatText.replace(/\{\{\s*descriptor\s*\}\}/g, descriptor);
+        treatmentLogicText = additionalPrompts.treatment_response_prompt || '';
+        treatmentLogicText = treatmentLogicText.replace(/\{\{\s*descriptor\s*\}\}/g, formatName(descriptor));
         natureOfIntentionToTreatText = '';
         npsleTipsText = '';
     }
     
-    let result = template
+    // Assemble full template: editable guidelines + non-editable clinical_note + non-editable output
+    let fullTemplate = guidelinesTemplate + clinicalNoteTemplate + outputTemplate;
+    
+    let result = fullTemplate
         .replace(/\{\{\s*date\s*\}\}/g, dateString)
         .replace(/\{\{\s*descriptor\s*\}\}/g, descriptor)
         .replace(/\{\{\s*information\s*\}\}/g, customRules)
         .replace(/\{\{\s*clinical_note\s*\}\}/g, clinicalNoteText)
         .replace(/\{\{\s*keywords\s*\}\}/g, keywordsText)
-        .replace(/\{\{\s*treatment_logic\s*\}\}/g, intentionToTreatText)
+        .replace(/\{\{\s*treatment_logic\s*\}\}/g, treatmentLogicText)
         .replace(/\{\{\s*nature_of_intention_to_treat\s*\}\}/g, natureOfIntentionToTreatText)
         .replace(/\{\{\s*npsle_tips\s*\}\}/g, npsleTipsText);
     
     return result.replace(/\{\{\s*\w+\s*\}\}/g, '');
-}
-
-function buildDescriptorOnly(descriptor, customRules) {
-    return `# Descriptor: ${descriptor}
-# SLEDAI-2K Weight: ${descriptorScores[descriptor]}
-# Type: ${descriptorTypes[descriptor] === 'TYPE_A' ? 'Clinical' : 'Laboratory'}
-
-'${descriptor}': '''${customRules}
-''',`;
 }
 
 function updateDateFieldVisibility() {
@@ -503,18 +732,52 @@ function updateDateFieldVisibility() {
 }
 
 function toggleClinicalNoteVisibility() {
-    const outputModeSelect = safeGetElement('outputModeSelect');
     const clinicalNoteCard = safeGetElement('clinicalNoteCard');
-    const outputMode = outputModeSelect ? outputModeSelect.value : 'full';
-    
     if (clinicalNoteCard) {
-        clinicalNoteCard.style.display = outputMode === 'descriptor' ? 'none' : 'block';
+        clinicalNoteCard.style.display = 'block';  // Always show since we removed output mode
     }
 }
 
 function toggleConfig() {
     const card = document.querySelector('.collapsible');
-    if (card) card.classList.toggle('collapsed');
+    if (!card) return;
+    
+    // Toggle collapsed class
+    card.classList.toggle('collapsed');
+    
+    // Adjust descriptor list height - but without forcing reflow
+    const descriptorList = document.querySelector('.descriptor-list');
+    if (descriptorList) {
+        if (card.classList.contains('collapsed')) {
+            descriptorList.classList.add('expanded');
+        } else {
+            descriptorList.classList.remove('expanded');
+        }
+    }
+    
+    // Use requestAnimationFrame to prevent layout thrashing
+    requestAnimationFrame(() => {
+        // Force the sidebar to recalculate its height smoothly
+        const sidebar = document.querySelector('.sidebar');
+        if (sidebar) {
+            sidebar.style.overflow = 'hidden';
+            setTimeout(() => {
+                sidebar.style.overflow = '';
+            }, 200);
+        }
+    });
+}
+
+function initDescriptorListHeight() {
+    const card = document.querySelector('.collapsible');
+    const descriptorList = document.querySelector('.descriptor-list');
+    if (card && descriptorList) {
+        if (card.classList.contains('collapsed')) {
+            descriptorList.classList.add('expanded');
+        } else {
+            descriptorList.classList.remove('expanded');
+        }
+    }
 }
 
 function copyOutput() {
@@ -529,9 +792,29 @@ function openTemplateModal() {
     const modal = safeGetElement('templateModal');
     if (!modal) return;
     
+    // Get currently selected note type
+    const noteTypeSelect = safeGetElement('noteTypeSelect');
+    const currentNoteType = noteTypeSelect ? noteTypeSelect.value : 'outpatient';
+    
+    const tabs = document.querySelectorAll('.modal-tab');
+    
+    tabs.forEach(tab => {
+        if (tab.dataset.templateType === currentNoteType) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+    
     const templateEditor = safeGetElement('templateEditor');
     if (templateEditor) {
-        templateEditor.value = templates[currentEditingTemplate === 'outpatient' ? 'outpatient' : 'discharge'] || '';
+        // Load the correct guidelines template
+        if (currentNoteType === 'outpatient') {
+            templateEditor.value = editableTemplates.outpatient_guidelines || '';
+        } else {
+            templateEditor.value = editableTemplates.inpatient_guidelines || '';
+        }
+        currentEditingTemplate = currentNoteType;
     }
     
     modal.style.display = 'flex';
@@ -556,21 +839,23 @@ function switchTemplateTab(templateType) {
     
     const editor = safeGetElement('templateEditor');
     if (editor) {
-        editor.value = templates[templateType] || '';
+        // Load the correct guidelines template based on selected tab
+        if (templateType === 'outpatient') {
+            editor.value = editableTemplates.outpatient_guidelines || '';
+        } else if (templateType === 'inpatient') {
+            editor.value = editableTemplates.inpatient_guidelines || '';
+        }
     }
 }
 
 function saveTemplate() {
     const templateEditor = safeGetElement('templateEditor');
     if (templateEditor) {
-        if (currentEditingTemplate === 'outpatient') {
-            templates.outpatient = templateEditor.value;
-        } else if (currentEditingTemplate === 'discharge') {
-            templates.discharge = templateEditor.value;
-        }
+        const templateKey = currentEditingTemplate === 'outpatient' ? 'outpatient_guidelines' : 'inpatient_guidelines';
+        editableTemplates[templateKey] = templateEditor.value;
     }
     
-    showToast(`Saved ${currentEditingTemplate === 'outpatient' ? 'Outpatient' : 'Discharge'} template`, 'success');
+    showToast(`Saved ${currentEditingTemplate === 'outpatient' ? 'Outpatient' : 'Inpatient'} guidelines template`, 'success');
     if (currentDescriptor) generateOutput();
     closeTemplateModal();
 }
@@ -710,6 +995,13 @@ function initTemplateModal() {
     });
 }
 
+function initDownloadButton() {
+    const downloadBtn = safeGetElement('downloadPromptBtn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', downloadPromptPy);
+    }
+}
+
 function showToast(message, type) {
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -723,33 +1015,39 @@ document.addEventListener('DOMContentLoaded', () => {
     loadPrompts();
     
     const noteTypeSelect = safeGetElement('noteTypeSelect');
-    const outputModeSelect = safeGetElement('outputModeSelect');
     const descriptorSearch = safeGetElement('descriptorSearch');
     const resetDescriptorBtn = safeGetElement('resetDescriptorBtn');
     const copyOutputBtn = safeGetElement('copyOutputBtn');
     const clearNoteBtn = safeGetElement('clearNoteBtn');
-    const toggleRawEditor = safeGetElement('toggleRawEditor');
+    const toggleRawPreview = safeGetElement('toggleRawPreview');
     const clinicalNote = safeGetElement('clinicalNote');
     const assessmentDate = safeGetElement('assessmentDate');
-    const rulesEditor = safeGetElement('rulesEditor');
+    const rulesPreview = safeGetElement('rulesPreview');
     const addThresholdBtn = safeGetElement('addThresholdRow');
     
     if (noteTypeSelect) noteTypeSelect.addEventListener('change', () => { updateDateFieldVisibility(); generateOutput(); });
-    if (outputModeSelect) outputModeSelect.addEventListener('change', () => { toggleClinicalNoteVisibility(); generateOutput(); });
     if (descriptorSearch) descriptorSearch.addEventListener('input', renderDescriptorList);
     if (resetDescriptorBtn) resetDescriptorBtn.addEventListener('click', resetToDefault);
     if (copyOutputBtn) copyOutputBtn.addEventListener('click', copyOutput);
     if (clearNoteBtn) clearNoteBtn.addEventListener('click', () => { if (clinicalNote) clinicalNote.value = ''; generateOutput(); });
-    if (toggleRawEditor) toggleRawEditor.addEventListener('click', () => {
-        const rawEditor = safeGetElement('rawEditor');
-        if (rawEditor) {
-            rawEditor.style.display = rawEditor.style.display === 'block' ? 'none' : 'block';
+    if (toggleRawPreview) toggleRawPreview.addEventListener('click', () => {
+        const rawPreview = safeGetElement('rawPreview');
+        if (rawPreview) {
+            const isVisible = rawPreview.style.display === 'block';
+            rawPreview.style.display = isVisible ? 'none' : 'block';
         }
     });
     if (addThresholdBtn) addThresholdBtn.addEventListener('click', () => addThresholdRow());
     if (clinicalNote) clinicalNote.addEventListener('input', generateOutput);
     if (assessmentDate) assessmentDate.addEventListener('input', generateOutput);
-    if (rulesEditor) rulesEditor.addEventListener('input', generateOutput);
+    if (rulesPreview) rulesPreview.addEventListener('input', generateOutput);
+    if (noteTypeSelect) {
+        noteTypeSelect.addEventListener('change', () => { 
+            updateDateFieldVisibility(); 
+            updateDownloadButtonText();
+            generateOutput(); 
+        });
+    }
     
     const typeAFields = ['diagnosticCriteria', 'clinicalExclusions', 'clinicalNotes'];
     typeAFields.forEach(field => {
@@ -775,6 +1073,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     initTemplateModal();
+    initDownloadButton();
+    initDescriptorListHeight();
     updateDateFieldVisibility();
     toggleClinicalNoteVisibility();
+    updateDownloadButtonText();
 });

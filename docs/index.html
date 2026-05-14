@@ -23,53 +23,49 @@
     <div class="container">
         <!-- Sidebar -->
         <aside class="sidebar">
-            <!-- Collapsible Configuration -->
+            <!-- Configuration Card -->
             <div class="sidebar-card collapsible">
                 <div class="sidebar-card-header" onclick="toggleConfig()">
                     <span>⚙️</span>
-                    <h3>Configuration</h3>
+                    <h3>Step 1: Global Template</h3>
                     <span class="collapse-icon">▼</span>
                 </div>
                 <div class="sidebar-card-body config-body">
-                    <div class="config-option">
-                        <button id="editTemplateBtn" class="btn-text" style="width: 100%; text-align: center; padding: 8px; margin-top: 8px;">
-                            ✏️ Edit Prompt Templates (General Guidelines)
-                        </button>
-                    </div>
-
                     <div class="config-option">
                         <label class="config-label">Note Type</label>
                         <div class="config-select">
                             <select id="noteTypeSelect">
                                 <option value="outpatient">Outpatient (assess at visit date)</option>
-                                <option value="discharge">Discharge (assess at admission date)</option>
+                                <option value="inpatient">Inpatient (assess at admission date)</option>
                             </select>
                         </div>
                     </div>
-                    
                     <div class="config-option">
-                        <label class="config-label">Output Mode</label>
-                        <div class="config-select">
-                            <select id="outputModeSelect">
-                                <option value="full">Full Prompt (with clinical note)</option>
-                                <option value="descriptor">Descriptor Only (just the rules)</option>
-                            </select>
-                        </div>
+                        <button id="editTemplateBtn" class="btn-text" style="width: 100%; text-align: center; padding: 8px; margin-top: 8px;">
+                            ✏️ Edit Prompt Templates
+                        </button>
                     </div>
-
                 </div>
             </div>
 
             <!-- Descriptors List -->
             <div class="sidebar-card">
                 <div class="sidebar-card-header">
-                    <span>🔍</span>
-                    <h3>Descriptors</h3>
+                    <span>📝</span>
+                    <h3>Step 2: Descriptor Rules</h3>
                 </div>
                 <div class="search-box">
                     <input type="text" id="descriptorSearch" placeholder="Search descriptors...">
                 </div>
                 <div class="descriptor-list" id="descriptorList"></div>
+                <div style="padding: 12px 10px; border-top: 1px solid var(--border);">
+                    <button id="downloadPromptBtn" class="btn-small" style="width: 100%;">
+                        📥 Download prompt.py
+                    </button>
+                    <small style="display: block; text-align: center; margin-top: 8px; font-size: 0.65rem; color: var(--text-muted); line-height: 1.4;">
+                        Replace the default prompt.py in <code>sledai-llm/prompts/</code>
+                    </small>
+                </div>
             </div>
         </aside>
 
@@ -126,7 +122,7 @@
                         <div class="editor-section">
                             <label class="editor-label">Quantitative Thresholds</label>
                             <div class="thresholds-header">
-                                <span class="threshold-label date-label">Time Period / Applicability</span>
+                                <span class="threshold-label date-label">Biomarker / Time Period</span>
                                 <span class="threshold-label value-label">Threshold & Units</span>
                                 <span class="threshold-label action-label"></span>
                             </div>
@@ -164,17 +160,16 @@
                             <label class="editor-label">Keywords to Look For</label>
                             <textarea id="typeBKeywords" class="editor-textarea" rows="2" 
                                     placeholder="e.g., C3, C4, complements, PLT, platelet, anti-ds DNA, WCC, WBC..."></textarea>
-                            <small class="help-text">Keywords that indicate this lab test is being discussed</small>
                         </div>
                     </div>
 
-                    <!-- Raw editor -->
+                    <!-- Raw Preview (read-only) -->
                     <div class="raw-toggle">
-                        <button id="toggleRawEditor" class="btn-text">✏️ Edit Raw Prompt Format</button>
+                        <button id="toggleRawPreview" class="btn-text">Preview Raw Format</button>
                     </div>
-                    <div id="rawEditor" style="display: none;">
-                        <textarea id="rulesEditor" class="raw-textarea" rows="8" 
-                                  placeholder="Raw prompt rules..."></textarea>
+                    <div id="rawPreview" style="display: none;">
+                        <textarea id="rulesPreview" class="raw-textarea" rows="8" readonly></textarea>
+                        <small class="help-text" style="display: block; margin-top: 8px;">This is a read-only preview of how the rules will be formatted</small>
                     </div>
                 </div>
             </div>
@@ -223,7 +218,7 @@
             </div>
             <div class="modal-tabs">
                 <button class="modal-tab active" data-template-type="outpatient">📄 Outpatient Template</button>
-                <button class="modal-tab" data-template-type="discharge">🏥 Discharge Template</button>
+                <button class="modal-tab" data-template-type="inpatient">🏥 Inpatient Template</button>
             </div>
             
             <div class="modal-body">
