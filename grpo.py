@@ -361,7 +361,7 @@ def build_prompt(source_dir, file, descrip, prompt_builder, v2_prompt):
     definitions = dict(base.definitions)
     if overrides and hasattr(overrides, "definitions"):
         definitions.update(overrides.definitions)
-    intention_to_treat = (
+    treatment_logic = (
         intention_to_treat_prompt
         if descrip in type_a_hard
         else treatment_response_prompt
@@ -380,7 +380,7 @@ def build_prompt(source_dir, file, descrip, prompt_builder, v2_prompt):
             "npsle_tips": npsle_prompt,
             "information": definitions[descrip],
             "clinical_note": clinical_note,
-            "intention_to_treat": intention_to_treat,
+            "treatment_logic": treatment_logic,
             "nature_of_intention_to_treat": nature_of_intention_to_treat,
         }
     }

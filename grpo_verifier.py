@@ -66,7 +66,7 @@ Important:
     return template
 
 # required parameters:
-# descriptor, intention_to_treat, information, keywords, nature_of_intention_to_treat
+# descriptor, treatment_logic, information, keywords, nature_of_intention_to_treat
 # date, clinical_note, model_output
 
 
@@ -118,7 +118,7 @@ def build_prompt(source_dir, file, descrip, model_output, template, base, overri
             "\nList of keywords:\n"
             + keywords_list[descrip]["keywords"]
         )
-    intention_to_treat = (
+    treatment_logic = (
         intention_to_treat_prompt
         if descrip in type_a_hard
         else treatment_response_prompt
@@ -137,7 +137,7 @@ def build_prompt(source_dir, file, descrip, model_output, template, base, overri
             "npsle_tips": npsle_prompt,
             "information": definitions[descrip],
             "clinical_note": clinical_note,
-            "intention_to_treat": intention_to_treat,
+            "treatment_logic": intentitreatment_logicon_to_treat,
             "nature_of_intention_to_treat": nature_of_intention_to_treat,
             "model_output": model_output,
         }

@@ -11,7 +11,7 @@ Given the information for {{ descriptor }}, assess the clinical note for evidenc
 Relevancy check
 - If no keywords are mentioned => `relevant = false`, `score = 0`, and skip remaining steps.
 - If keywords are mentioned => `relevant = true`, and continue this guideline.
-{{ intention_to_treat }}
+{{ treatment_logic }}
 Exclusions:
 - Look for exclusions in the clinical note that may explain the symptom, but not SLE itself. These exclusions may justify scoring the descriptor but make the criteria `unfulfilled_diagnostic`.
 - Only count exclusions if they are explicitly written in the note. If not mentioned, assume no exclusions.
