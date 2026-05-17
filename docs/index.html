@@ -41,10 +41,33 @@
                         </div>
                     </div>
                     <div class="config-option">
-                        <button id="editTemplateBtn" class="btn-text" style="width: 100%; text-align: center; padding: 8px; margin-top: 8px;">
-                            ✏️ Edit Prompt Templates
+                        <button id="editTemplateBtn" class="btn-text">
+                            ✏️ Edit Prompt Template
                         </button>
+                        <small class="help-text">Edit the general guidelines (shared across all descriptors)</small>
                     </div>
+                </div>
+            </div>
+
+            <!-- Clinical Note Card -->
+            <div class="sidebar-card collapsible" id="clinicalNoteSidebarCard">
+                <div class="sidebar-card-header" onclick="toggleClinicalNoteSidebar()">
+                    <span>📋</span>
+                    <h3>Step 2: Clinical Note (Optional)</h3>
+                    <span class="collapse-icon">▼</span>
+                </div>
+                <div class="sidebar-card-body">
+                    <div class="clinical-note-preview">
+                        <small>Current note preview:</small>
+                        <div id="clinicalNotePreview">No clinical note entered yet</div>
+                        <div id="clinicalNoteDatePreview"></div>
+                    </div>
+                    <button id="editClinicalNoteBtn" class="btn-clinical-note" style="width: 100%;">
+                        ✏️ Edit Clinical Note
+                    </button>
+                    <small class="help-text" style="display: block; margin-top: 8px;">
+                        Optional: Add a clinical note to use when generating prompts
+                    </small>
                 </div>
             </div>
 
@@ -52,7 +75,7 @@
             <div class="sidebar-card">
                 <div class="sidebar-card-header">
                     <span>📝</span>
-                    <h3>Step 2: Descriptor Rules</h3>
+                    <h3>Step 3: Descriptor Rules</h3>
                 </div>
                 <div class="search-box">
                     <input type="text" id="descriptorSearch" placeholder="Search descriptors...">
@@ -63,7 +86,7 @@
                         📥 Download prompt.py
                     </button>
                     <small style="display: block; text-align: center; margin-top: 8px; font-size: 0.65rem; color: var(--text-muted); line-height: 1.4;">
-                        Replace the default prompt.py in <code>sledai-llm/prompts/</code>
+                        Replace the default prompt.py in <code>sledai-llm/prompts/</code> (does not include clinical note)
                     </small>
                 </div>
             </div>
@@ -174,27 +197,6 @@
                 </div>
             </div>
 
-            <!-- Clinical Note Card -->
-            <div class="main-card" id="clinicalNoteCard">
-                <div class="main-card-header">
-                    <h2>📝 Clinical Note</h2>
-                    <button id="clearNoteBtn" class="btn-outline">Clear</button>
-                </div>
-                <div class="main-card-body">
-                    <div class="date-section">
-                        <label class="editor-label" id="dateLabel">📅 Assessment Date (Visit Date)</label>
-                        <input type="date" id="assessmentDate" class="editor-input">
-                        <small class="help-text" id="dateHelpText">Select the visit date for outpatient notes</small>
-                    </div>
-                    
-                    <div class="editor-section">
-                        <label class="editor-label">Clinical Note Text</label>
-                        <textarea id="clinicalNote" class="clinical-textarea" rows="10" 
-                                placeholder="Paste your clinical note here..."></textarea>
-                    </div>
-                </div>
-            </div>
-
             <!-- Output -->
             <div class="main-card output-card">
                 <div class="main-card-header">
@@ -208,19 +210,47 @@
         </main>
     </div>
 
+    <!-- Clinical Note Modal -->
+    <div id="clinicalNoteModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeClinicalNoteModal()"></div>
+        <div class="modal-container" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>Enter Clinical Note</h3>
+                <button class="modal-close" onclick="closeClinicalNoteModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info" style="margin-bottom: 20px;">
+                    <span>💡</span><strong>Optional:</strong> This clinical note will be used for all descriptors when generating prompts. 
+                </div>
+                
+                <div class="editor-section">
+                    <label class="editor-label">Visit Date</label>
+                    <input type="date" id="modalAssessmentDate" class="editor-input">
+                    <small class="help-text">For outpatient notes: select the visit date (dd/mm/yyyy format)</small>
+                </div>
+                
+                <div class="editor-section">
+                    <label class="editor-label">Clinical Note Text</label>
+                    <textarea id="modalClinicalNote" class="editor-textarea" rows="14" 
+                            placeholder="Paste your clinical note here...&#10;&#10;Example:&#10;Note:&#10;Temp 38.5°C, joint pain, and malar rash.&#10;C3 7, dsDNA 80&#10;Management Plan:&#10;prednisone..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-outline" id="clearClinicalNoteBtn">Clear</button>
+                <button class="btn-outline" onclick="closeClinicalNoteModal()">Cancel</button>
+                <button class="btn-primary" id="saveClinicalNoteBtn">💾 Save Clinical Note</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Template Editor Modal -->
     <div id="templateModal" class="modal" style="display: none;">
         <div class="modal-overlay" onclick="closeTemplateModal()"></div>
         <div class="modal-container">
             <div class="modal-header">
-                <h3>✏️ Edit Prompt Templates</h3>
+                <h3 id="templateModalTitle">✏️ Edit Outpatient Template</h3>
                 <button class="modal-close" onclick="closeTemplateModal()">&times;</button>
             </div>
-            <div class="modal-tabs">
-                <button class="modal-tab active" data-template-type="outpatient">📄 Outpatient Template</button>
-                <button class="modal-tab" data-template-type="inpatient">🏥 Inpatient Template</button>
-            </div>
-            
             <div class="modal-body">
                 <div class="placeholder-legend">
                     <span>💡 Click on any <code class="placeholder-highlight">{{ placeholder }}</code> in the template below to edit its content:</span>
@@ -240,7 +270,7 @@
         </div>
     </div>
 
-    <!-- Edit Treatment Logic Modal (Shows Both Prompts) -->
+    <!-- Edit Treatment Logic Modal -->
     <div id="treatmentLogicModal" class="modal" style="display: none;">
         <div class="modal-overlay" onclick="closeTreatmentLogicModal()"></div>
         <div class="modal-container" style="max-width: 800px;">

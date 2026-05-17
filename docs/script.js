@@ -5,13 +5,15 @@ let descriptorTypes = {};
 let descriptorScores = {};
 let keywordsList = {};
 let originalKeywordsList = {};
-let templates = { outpatient: '', inpatient: '' };
-let currentDescriptor = null;
-let thresholdRowCounter = 0;
+let editableTemplates = {};
+let nonEditableTemplates = {};
 let additionalPrompts = {};
 let typeAHard = [];
-let currentEditingTemplate = 'outpatient';
+let currentDescriptor = null;
+let thresholdRowCounter = 0;
 let customRules = {};
+let currentClinicalNote = '';
+let currentAssessmentDate = '';
 
 // Helper function to safely get element
 function safeGetElement(id) {
@@ -27,6 +29,12 @@ function escapeHtml(str) {
         if (m === '>') return '&gt;';
         return m;
     });
+}
+
+// Get current note type from DOM
+function getCurrentNoteType() {
+    const noteTypeSelect = safeGetElement('noteTypeSelect');
+    return noteTypeSelect ? noteTypeSelect.value : 'outpatient';
 }
 
 // Parse structured text format back into structured data
@@ -192,10 +200,7 @@ function scrollToDescriptorEditor() {
     const elementPosition = titleCard.getBoundingClientRect().top;
     const offsetPosition = elementPosition + window.pageYOffset - navbarHeight - 16;
     
-    window.scrollTo({
-        top: offsetPosition,
-        behavior: 'smooth'
-    });
+    window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
 }
 
 // Add threshold row function
@@ -238,6 +243,90 @@ function addThresholdRow(dateRange = '', condition = '<', value = '', units = ''
     });
 }
 
+function updateClinicalNotePreview() {
+    const previewDiv = safeGetElement('clinicalNotePreview');
+    const datePreviewDiv = safeGetElement('clinicalNoteDatePreview');
+    const isOutpatient = getCurrentNoteType() === 'outpatient';
+    
+    if (previewDiv) {
+        if (currentClinicalNote) {
+            let preview = currentClinicalNote.substring(0, 120);
+            if (currentClinicalNote.length > 120) preview += '...';
+            previewDiv.textContent = preview;
+        } else {
+            previewDiv.textContent = 'No clinical note entered yet';
+        }
+    }
+    
+    if (datePreviewDiv) {
+        if (isOutpatient && currentAssessmentDate) {
+            const formattedDate = formatDate(currentAssessmentDate);
+            datePreviewDiv.innerHTML = `📅 <strong>Date:</strong> ${formattedDate}`;
+            datePreviewDiv.style.display = 'block';
+        } else {
+            datePreviewDiv.style.display = 'none';
+        }
+    }
+}
+
+function openClinicalNoteModal() {
+    const modal = safeGetElement('clinicalNoteModal');
+    const modalClinicalNote = safeGetElement('modalClinicalNote');
+    const modalAssessmentDate = safeGetElement('modalAssessmentDate');
+    const modalDateSection = safeGetElement('modalDateSection');
+    const isOutpatient = getCurrentNoteType() === 'outpatient';
+    
+    if (!modal) return;
+    
+    if (modalClinicalNote) modalClinicalNote.value = currentClinicalNote;
+    if (modalAssessmentDate) modalAssessmentDate.value = currentAssessmentDate;
+    
+    // Show/hide date section and update label
+    if (modalDateSection) {
+        modalDateSection.style.display = isOutpatient ? 'block' : 'none';
+        const dateLabel = modalDateSection.querySelector('.editor-label');
+        if (dateLabel) {
+            dateLabel.textContent = isOutpatient ? '📅 Visit Date (for Outpatient)' : '';
+        }
+    }
+    
+    modal.style.display = 'flex';
+}
+
+
+function closeClinicalNoteModal() {
+    const modal = safeGetElement('clinicalNoteModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function clearClinicalNote() {
+    const modalClinicalNote = safeGetElement('modalClinicalNote');
+    const modalAssessmentDate = safeGetElement('modalAssessmentDate');
+    
+    if (modalClinicalNote) modalClinicalNote.value = '';
+    if (modalAssessmentDate) modalAssessmentDate.value = '';
+    
+    showToast('Clinical note cleared', 'success');
+}
+
+function saveClinicalNote() {
+    const modalClinicalNote = safeGetElement('modalClinicalNote');
+    const modalAssessmentDate = safeGetElement('modalAssessmentDate');
+    const isOutpatient = getCurrentNoteType() === 'outpatient';
+    
+    if (modalClinicalNote) currentClinicalNote = modalClinicalNote.value;
+    if (isOutpatient && modalAssessmentDate) {
+        currentAssessmentDate = modalAssessmentDate.value;
+    } else {
+        currentAssessmentDate = '';
+    }
+    
+    updateClinicalNotePreview();
+    closeClinicalNoteModal();
+    generateOutput();
+    showToast('Clinical note saved!', 'success');
+}
+
 // Update selectDescriptor to load saved rules
 function selectDescriptor(desc, fromUserClick = false) {
     currentDescriptor = desc;
@@ -248,7 +337,7 @@ function selectDescriptor(desc, fromUserClick = false) {
     
     const titleElement = safeGetElement('currentDescriptorTitle');
     if (titleElement) {
-        titleElement.innerHTML = `${formatName(desc)} <span style="font-size:0.7rem; opacity:0.7;">Score: ${descriptorScores[desc]}</span>`;
+        titleElement.innerHTML = `${formatName(desc)} <span style="font-size:0.7rem; opacity:0.7;">Weight: ${descriptorScores[desc]}</span>`;
     }
     
     const isTypeB = descriptorTypes[desc] === 'TYPE_B';
@@ -443,9 +532,7 @@ function updateRawFromStructured() {
     
     // Update the preview (read-only)
     const rulesPreview = safeGetElement('rulesPreview');
-    if (rulesPreview) {
-        rulesPreview.value = newRules;
-    }
+    if (rulesPreview) rulesPreview.value = newRules;
     
     customRules[currentDescriptor] = newRules;
     
@@ -453,19 +540,16 @@ function updateRawFromStructured() {
 }
 
 function updateDownloadButtonText() {
-    const noteTypeSelect = safeGetElement('noteTypeSelect');
+    const isOutpatient = getCurrentNoteType() === 'outpatient';
     const downloadBtn = safeGetElement('downloadPromptBtn');
-    if (noteTypeSelect && downloadBtn) {
-        const isOutpatient = noteTypeSelect.value === 'outpatient';
+    if (downloadBtn) {
         downloadBtn.textContent = isOutpatient ? '📥 Download prompt.py (Outpatient)' : '📥 Download prompt.py (Inpatient)';
     }
 }
 
 // Add download prompt.py function
 function downloadPromptPy() {
-    const noteTypeSelect = safeGetElement('noteTypeSelect');
-    const currentNoteType = noteTypeSelect ? noteTypeSelect.value : 'outpatient';
-    const isOutpatient = currentNoteType === 'outpatient';
+    const isOutpatient = getCurrentNoteType() === 'outpatient';
     
     let content = `# SLEDAI-2K Prompt Configuration - ${isOutpatient ? 'OUTPATIENT' : 'INPATIENT'}\n`;
     content += `# Generated from SLEDAI-2K Prompt Customizer\n# Note Type: ${isOutpatient ? 'Outpatient (assess at visit date)' : 'Inpatient/Discharge (assess at admission date)'}\n\n`;
@@ -644,34 +728,27 @@ function formatDate(dateInput) {
 function generateOutput() {
     if (!currentDescriptor) return;
     
-    const noteTypeSelect = safeGetElement('noteTypeSelect');
     const rulesPreview = safeGetElement('rulesPreview');
-    
-    const noteType = noteTypeSelect ? noteTypeSelect.value : 'outpatient';
     const customRulesContent = rulesPreview ? rulesPreview.value : '';
     
-    const output = buildFullPrompt(noteType, currentDescriptor, customRulesContent);
+    const output = buildFullPrompt(customRulesContent);
     
     const outputContent = safeGetElement('outputContent');
     if (outputContent) outputContent.textContent = output;
 }
 
-function buildFullPrompt(noteType, descriptor, customRules) {
-    const clinicalNote = safeGetElement('clinicalNote');
-    const assessmentDate = safeGetElement('assessmentDate');
+function buildFullPrompt(customRulesContent) {
+    const noteType = getCurrentNoteType();
+    const isOutpatient = noteType === 'outpatient';
     
-    let clinicalNoteText = clinicalNote ? clinicalNote.value : '';
-    if (!clinicalNoteText || clinicalNoteText.trim() === '') {
-        clinicalNoteText = '[INSERT CLINICAL NOTE HERE]';
-    }
-    
+    let clinicalNoteText = currentClinicalNote || '[INSERT CLINICAL NOTE HERE]';
     let dateString = '';
     let guidelinesTemplate = '';
     let clinicalNoteTemplate = '';
     let outputTemplate = nonEditableTemplates.output_template;
     
-    if (noteType === 'outpatient') {
-        dateString = formatDate(assessmentDate ? assessmentDate.value : '');
+    if (isOutpatient) {
+        dateString = formatDate(currentAssessmentDate);
         guidelinesTemplate = editableTemplates.outpatient_guidelines;
         clinicalNoteTemplate = nonEditableTemplates.outpatient_clinical_note;
     } else {
@@ -679,8 +756,8 @@ function buildFullPrompt(noteType, descriptor, customRules) {
         clinicalNoteTemplate = nonEditableTemplates.inpatient_clinical_note;
     }
     
-    const keywordsText = buildKeywordsText(descriptor);
-    const isHardDescriptor = typeAHard.includes(descriptor);
+    const keywordsText = buildKeywordsText(currentDescriptor);
+    const isHardDescriptor = typeAHard.includes(currentDescriptor);
     
     let treatmentLogicText = '';
     let natureOfIntentionToTreatText = '';
@@ -688,12 +765,12 @@ function buildFullPrompt(noteType, descriptor, customRules) {
     
     if (isHardDescriptor) {
         treatmentLogicText = additionalPrompts.intention_to_treat_prompt || '';
-        treatmentLogicText = treatmentLogicText.replace(/\{\{\s*descriptor\s*\}\}/g, formatName(descriptor));
+        treatmentLogicText = treatmentLogicText.replace(/\{\{\s*descriptor\s*\}\}/g, formatName(currentDescriptor));
         natureOfIntentionToTreatText = additionalPrompts.nature_of_intention_to_treat_prompt || '';
         npsleTipsText = additionalPrompts.npsle_tips || '';
     } else {
         treatmentLogicText = additionalPrompts.treatment_response_prompt || '';
-        treatmentLogicText = treatmentLogicText.replace(/\{\{\s*descriptor\s*\}\}/g, formatName(descriptor));
+        treatmentLogicText = treatmentLogicText.replace(/\{\{\s*descriptor\s*\}\}/g, formatName(currentDescriptor));
         natureOfIntentionToTreatText = '';
         npsleTipsText = '';
     }
@@ -703,8 +780,8 @@ function buildFullPrompt(noteType, descriptor, customRules) {
     
     let result = fullTemplate
         .replace(/\{\{\s*date\s*\}\}/g, dateString)
-        .replace(/\{\{\s*descriptor\s*\}\}/g, descriptor)
-        .replace(/\{\{\s*information\s*\}\}/g, customRules)
+        .replace(/\{\{\s*descriptor\s*\}\}/g, currentDescriptor)
+        .replace(/\{\{\s*information\s*\}\}/g, customRulesContent)
         .replace(/\{\{\s*clinical_note\s*\}\}/g, clinicalNoteText)
         .replace(/\{\{\s*keywords\s*\}\}/g, keywordsText)
         .replace(/\{\{\s*treatment_logic\s*\}\}/g, treatmentLogicText)
@@ -715,26 +792,22 @@ function buildFullPrompt(noteType, descriptor, customRules) {
 }
 
 function updateDateFieldVisibility() {
-    const noteTypeSelect = safeGetElement('noteTypeSelect');
-    const dateSection = document.querySelector('.date-section');
-    const dateLabel = safeGetElement('dateLabel');
-    const helpText = safeGetElement('dateHelpText');
-    const noteType = noteTypeSelect ? noteTypeSelect.value : 'outpatient';
-    
-    if (noteType === 'outpatient') {
-        if (dateSection) dateSection.classList.remove('hidden');
-        if (dateLabel) dateLabel.innerHTML = '📅 Assessment Date (Visit Date)';
-        if (helpText) helpText.textContent = 'Select the visit date for outpatient notes';
-    } else {
-        if (dateSection) dateSection.classList.add('hidden');
-    }
     generateOutput();
 }
 
-function toggleClinicalNoteVisibility() {
-    const clinicalNoteCard = safeGetElement('clinicalNoteCard');
-    if (clinicalNoteCard) {
-        clinicalNoteCard.style.display = 'block';  // Always show since we removed output mode
+function toggleClinicalNoteSidebar() {
+    const card = document.getElementById('clinicalNoteSidebarCard');
+    if (card) {
+        card.classList.toggle('collapsed');
+    }
+    // Adjust descriptor list height - but without forcing reflow
+    const descriptorList = document.querySelector('.descriptor-list');
+    if (descriptorList) {
+        if (card.classList.contains('collapsed')) {
+            descriptorList.classList.add('expanded');
+        } else {
+            descriptorList.classList.remove('expanded');
+        }
     }
 }
 
@@ -754,18 +827,6 @@ function toggleConfig() {
             descriptorList.classList.remove('expanded');
         }
     }
-    
-    // Use requestAnimationFrame to prevent layout thrashing
-    requestAnimationFrame(() => {
-        // Force the sidebar to recalculate its height smoothly
-        const sidebar = document.querySelector('.sidebar');
-        if (sidebar) {
-            sidebar.style.overflow = 'hidden';
-            setTimeout(() => {
-                sidebar.style.overflow = '';
-            }, 200);
-        }
-    });
 }
 
 function initDescriptorListHeight() {
@@ -790,31 +851,24 @@ function copyOutput() {
 // Template Modal Functions
 function openTemplateModal() {
     const modal = safeGetElement('templateModal');
+    const modalTitle = safeGetElement('templateModalTitle');
     if (!modal) return;
     
-    // Get currently selected note type
-    const noteTypeSelect = safeGetElement('noteTypeSelect');
-    const currentNoteType = noteTypeSelect ? noteTypeSelect.value : 'outpatient';
+    const currentNoteType = getCurrentNoteType();
+    const isOutpatient = currentNoteType === 'outpatient';
     
-    const tabs = document.querySelectorAll('.modal-tab');
-    
-    tabs.forEach(tab => {
-        if (tab.dataset.templateType === currentNoteType) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
-    });
+    // Update modal title
+    if (modalTitle) {
+        modalTitle.textContent = isOutpatient ? 'Edit Outpatient Template' : 'Edit Inpatient Template';
+    }
     
     const templateEditor = safeGetElement('templateEditor');
     if (templateEditor) {
-        // Load the correct guidelines template
-        if (currentNoteType === 'outpatient') {
+        if (isOutpatient) {
             templateEditor.value = editableTemplates.outpatient_guidelines || '';
         } else {
             templateEditor.value = editableTemplates.inpatient_guidelines || '';
         }
-        currentEditingTemplate = currentNoteType;
     }
     
     modal.style.display = 'flex';
@@ -826,20 +880,8 @@ function closeTemplateModal() {
 }
 
 function switchTemplateTab(templateType) {
-    currentEditingTemplate = templateType;
-    
-    const tabs = document.querySelectorAll('.modal-tab');
-    tabs.forEach(tab => {
-        if (tab.dataset.templateType === templateType) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
-    });
-    
     const editor = safeGetElement('templateEditor');
     if (editor) {
-        // Load the correct guidelines template based on selected tab
         if (templateType === 'outpatient') {
             editor.value = editableTemplates.outpatient_guidelines || '';
         } else if (templateType === 'inpatient') {
@@ -850,12 +892,14 @@ function switchTemplateTab(templateType) {
 
 function saveTemplate() {
     const templateEditor = safeGetElement('templateEditor');
+    const currentNoteType = getCurrentNoteType();
+    
     if (templateEditor) {
-        const templateKey = currentEditingTemplate === 'outpatient' ? 'outpatient_guidelines' : 'inpatient_guidelines';
+        const templateKey = currentNoteType === 'outpatient' ? 'outpatient_guidelines' : 'inpatient_guidelines';
         editableTemplates[templateKey] = templateEditor.value;
     }
     
-    showToast(`Saved ${currentEditingTemplate === 'outpatient' ? 'Outpatient' : 'Inpatient'} guidelines template`, 'success');
+    showToast(`Saved ${currentNoteType === 'outpatient' ? 'Outpatient' : 'Inpatient'} guidelines template`, 'success');
     if (currentDescriptor) generateOutput();
     closeTemplateModal();
 }
@@ -970,11 +1014,6 @@ function initTemplateModal() {
     const saveNpsleBtn = safeGetElement('saveNpsleBtn');
     if (saveNpsleBtn) saveNpsleBtn.addEventListener('click', saveNpslePrompt);
     
-    const tabs = document.querySelectorAll('.modal-tab');
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => switchTemplateTab(tab.dataset.templateType));
-    });
-    
     setupTemplateEditorClickDetection();
     setupLegendClickHandlers();
     
@@ -983,6 +1022,7 @@ function initTemplateModal() {
             closeTemplateModal();
             closeTreatmentLogicModal();
             closeNpsleModal();
+            closeClinicalNoteModal();
         }
     });
     
@@ -991,8 +1031,20 @@ function initTemplateModal() {
             closeTemplateModal();
             closeTreatmentLogicModal();
             closeNpsleModal();
+            closeClinicalNoteModal();
         });
     });
+}
+
+function initClinicalNoteModal() {
+    const editBtn = safeGetElement('editClinicalNoteBtn');
+    if (editBtn) editBtn.addEventListener('click', openClinicalNoteModal);
+    
+    const saveBtn = safeGetElement('saveClinicalNoteBtn');
+    if (saveBtn) saveBtn.addEventListener('click', saveClinicalNote);
+    
+    const clearBtn = safeGetElement('clearClinicalNoteBtn');
+    if (clearBtn) clearBtn.addEventListener('click', clearClinicalNote);
 }
 
 function initDownloadButton() {
@@ -1000,6 +1052,7 @@ function initDownloadButton() {
     if (downloadBtn) {
         downloadBtn.addEventListener('click', downloadPromptPy);
     }
+    updateDownloadButtonText();
 }
 
 function showToast(message, type) {
@@ -1018,38 +1071,31 @@ document.addEventListener('DOMContentLoaded', () => {
     const descriptorSearch = safeGetElement('descriptorSearch');
     const resetDescriptorBtn = safeGetElement('resetDescriptorBtn');
     const copyOutputBtn = safeGetElement('copyOutputBtn');
-    const clearNoteBtn = safeGetElement('clearNoteBtn');
     const toggleRawPreview = safeGetElement('toggleRawPreview');
-    const clinicalNote = safeGetElement('clinicalNote');
-    const assessmentDate = safeGetElement('assessmentDate');
-    const rulesPreview = safeGetElement('rulesPreview');
     const addThresholdBtn = safeGetElement('addThresholdRow');
     
-    if (noteTypeSelect) noteTypeSelect.addEventListener('change', () => { updateDateFieldVisibility(); generateOutput(); });
-    if (descriptorSearch) descriptorSearch.addEventListener('input', renderDescriptorList);
-    if (resetDescriptorBtn) resetDescriptorBtn.addEventListener('click', resetToDefault);
-    if (copyOutputBtn) copyOutputBtn.addEventListener('click', copyOutput);
-    if (clearNoteBtn) clearNoteBtn.addEventListener('click', () => { if (clinicalNote) clinicalNote.value = ''; generateOutput(); });
-    if (toggleRawPreview) toggleRawPreview.addEventListener('click', () => {
-        const rawPreview = safeGetElement('rawPreview');
-        if (rawPreview) {
-            const isVisible = rawPreview.style.display === 'block';
-            rawPreview.style.display = isVisible ? 'none' : 'block';
-        }
-    });
-    if (addThresholdBtn) addThresholdBtn.addEventListener('click', () => addThresholdRow());
-    if (clinicalNote) clinicalNote.addEventListener('input', generateOutput);
-    if (assessmentDate) assessmentDate.addEventListener('input', generateOutput);
-    if (rulesPreview) rulesPreview.addEventListener('input', generateOutput);
     if (noteTypeSelect) {
-        noteTypeSelect.addEventListener('change', () => { 
-            updateDateFieldVisibility(); 
+        noteTypeSelect.addEventListener('change', () => {
             updateDownloadButtonText();
+            updateClinicalNotePreview();
             generateOutput(); 
         });
     }
+    if (descriptorSearch) descriptorSearch.addEventListener('input', renderDescriptorList);
+    if (resetDescriptorBtn) resetDescriptorBtn.addEventListener('click', resetToDefault);
+    if (copyOutputBtn) copyOutputBtn.addEventListener('click', copyOutput);
+    if (addThresholdBtn) addThresholdBtn.addEventListener('click', () => addThresholdRow());
     
-    const typeAFields = ['diagnosticCriteria', 'clinicalExclusions', 'clinicalNotes'];
+    if (toggleRawPreview) {
+        toggleRawPreview.addEventListener('click', () => {
+            const rawPreview = safeGetElement('rawPreview');
+            if (rawPreview) {
+                rawPreview.style.display = rawPreview.style.display === 'block' ? 'none' : 'block';
+            }
+        });
+    }
+    
+    const typeAFields = ['diagnosticCriteria', 'clinicalExclusions', 'clinicalNotes', 'keywords'];
     typeAFields.forEach(field => {
         const el = safeGetElement(field);
         if (el) el.addEventListener('input', updateRawFromStructured);
@@ -1061,9 +1107,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (el) el.addEventListener('input', updateRawFromStructured);
     });
     
-    const keywords = safeGetElement('keywords');
-    if (keywords) keywords.addEventListener('input', updateRawFromStructured);
-    
     const thresholdRowsContainer = safeGetElement('thresholdRows');
     if (thresholdRowsContainer) {
         thresholdRowsContainer.addEventListener('input', updateRawFromStructured);
@@ -1073,9 +1116,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     initTemplateModal();
+    initClinicalNoteModal();
     initDownloadButton();
+    initGenerateButton();
     initDescriptorListHeight();
-    updateDateFieldVisibility();
-    toggleClinicalNoteVisibility();
-    updateDownloadButtonText();
+    updateClinicalNotePreview();
 });
