@@ -15,7 +15,20 @@
                 <span class="logo-text">SLEDAI-2K Prompt Customizer</span>
             </div>
             <div class="nav-links">
-                <a href="https://github.com/reneeleung/sledai-llm" class="nav-link" target="_blank">GitHub</a>
+                <button id="helpBtn" class="nav-link nav-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 4px;">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    Help
+                </button>
+                <a href="https://github.com/reneeleung/sledai-llm" class="nav-link" target="_blank">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="margin-right: 4px;">
+                        <path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.438 9.8 8.205 11.387.6.113.82-.26.82-.58 0-.287-.01-1.05-.015-2.06-3.338.726-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.082-.73.082-.73 1.205.085 1.84 1.237 1.84 1.237 1.07 1.834 2.807 1.304 3.492.997.108-.775.418-1.305.762-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.468-2.38 1.235-3.22-.123-.3-.535-1.52.117-3.16 0 0 1.008-.322 3.3 1.23.96-.267 1.98-.4 3-.405 1.02.005 2.04.138 3 .405 2.29-1.552 3.297-1.23 3.297-1.23.653 1.64.24 2.86.118 3.16.768.84 1.233 1.91 1.233 3.22 0 4.61-2.804 5.62-5.476 5.92.43.37.824 1.102.824 2.22 0 1.602-.015 2.894-.015 3.287 0 .322.216.698.83.578C20.565 21.795 24 17.298 24 12c0-6.63-5.37-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
             </div>
         </div>
     </nav>
@@ -208,6 +221,40 @@
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Help Modal -->
+    <div id="helpModal" class="modal" style="display: none;">
+        <div class="modal-overlay" onclick="closeHelpModal()"></div>
+        <div class="modal-container" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>📖 Quick Guide</h3>
+                <button class="modal-close" onclick="closeHelpModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div style="display: flex; flex-direction: column; gap: 16px;">
+                    <div>
+                        <strong>1️⃣ Global Template</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0 0;">Configure note type and edit the base guidelines.</p>
+                    </div>
+                    <div>
+                        <strong>2️⃣ Clinical Note (Optional)</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0 0;">Optional: Add your clinical note, used for all descriptors.</p>
+                    </div>
+                    <div>
+                        <strong>3️⃣ Descriptor Rules</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0 0;">Select any descriptor and customize its diagnostic criteria.</p>
+                    </div>
+                    <div>
+                        <strong>4️⃣ Generate & Download</strong>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin: 4px 0 0 0;">Copy the generated prompt for immediate use, or download prompt.py for your framework.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-primary" onclick="closeHelpModal()">Got it</button>
+            </div>
+        </div>
     </div>
 
     <!-- Clinical Note Modal -->

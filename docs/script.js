@@ -1063,6 +1063,16 @@ function showToast(message, type) {
     setTimeout(() => toast.remove(), 2000);
 }
 
+function openHelpModal() {
+    const modal = safeGetElement('helpModal');
+    if (modal) modal.style.display = 'flex';
+}
+
+function closeHelpModal() {
+    const modal = safeGetElement('helpModal');
+    if (modal) modal.style.display = 'none';
+}
+
 // Event listeners
 document.addEventListener('DOMContentLoaded', () => {
     loadPrompts();
@@ -1073,6 +1083,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const copyOutputBtn = safeGetElement('copyOutputBtn');
     const toggleRawPreview = safeGetElement('toggleRawPreview');
     const addThresholdBtn = safeGetElement('addThresholdRow');
+    const helpBtn = safeGetElement('helpBtn');
     
     if (noteTypeSelect) {
         noteTypeSelect.addEventListener('change', () => {
@@ -1085,6 +1096,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (resetDescriptorBtn) resetDescriptorBtn.addEventListener('click', resetToDefault);
     if (copyOutputBtn) copyOutputBtn.addEventListener('click', copyOutput);
     if (addThresholdBtn) addThresholdBtn.addEventListener('click', () => addThresholdRow());
+    if (helpBtn) helpBtn.addEventListener('click', openHelpModal);
     
     if (toggleRawPreview) {
         toggleRawPreview.addEventListener('click', () => {
