@@ -12,9 +12,7 @@ def get_descrip_scores_across_runs(n_runs, llm_judge, grouped):
     ensemble_outputs = {}
     ensemble_outputs_judge = {}
     for i in range(n_runs):
-        results_dir = results_dir_prefix
-        if n_runs != 1:
-            results_dir += f'_{i+1}'
+        results_dir = results_dir_prefix + f'_{i+1}'
         with open(f'{results_dir}/outputs.pkl', 'rb') as f:
                 results = pickle.load(f)
         if llm_judge:

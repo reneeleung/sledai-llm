@@ -73,5 +73,10 @@ Place your clinical notes (.txt) in a folder under `data/`, e.g. `data/sample/`.
 python inference.py --model_name gptoss_120b --test_folder sample --n_run 1
 ```
 
+Then to create a majority-vote scores CSV (under `results_inference/`):
+```
+python inference_summarise.py --model_name gptoss_120b --test_folder sample --n_runs 5
+```
+
 ## License
 This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for details.

@@ -1,7 +1,9 @@
-data/sample658
+data/sample*
 data/sledai-notes
 data/*.csv
 **/**/__pycache__/
 save/
 results_grpo/
+results_inference/
+model_performance_summary/
 unsloth_compiled_cache/
