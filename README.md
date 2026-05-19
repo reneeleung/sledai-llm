@@ -24,22 +24,20 @@ python brat_to_csv.py
 In `recipes.py`, you may set the number of GPUs required to run the LLM. For example, GPT-OSS-120b requires 2xL40Ss, or 4x4090s.
 
 The following script runs inference on the full set. To only run on the test set, remove `--test_full`.
-
-Note: If your data contains discharge notes (such as MIMIC-IV), use prompt V2 to assess SLEDAI scores at the time of admission (instead of the date of the clinical note).
 ```
 python grpo.py --grpo_base_model gptoss_120b --test --base --test_full --test_folder sledai-notes --no_train_test_split --n_run 1
 ```
 
-For grouped descriptors prompt, run the following (note v2_prompt is not supported in grouped descriptors prompt):
+For grouped descriptors prompt, run the following:
 ```
 python grpo_grouped.py --grpo_base_model gptoss_120b --test --base --test_full --test_folder sample658 --n_run 1
 ```
 
-Note: If you are running inference across different machines, make sure to use the same `save/dataset_*` or `save/dataset_grouped_*` to ensure the order of prompts is the same for the train/test data.
+**Note**: If you are running inference across different machines, make sure to use the same `save/dataset_*` or `save/dataset_grouped_*` to ensure the order of prompts is the same for the train/test data.
 
 4. Second-layer verifier
 
-To following runs the second-layer verifier based on outputs of the first layer. Similary, use v2_prompt if data contains discharge notes.
+To following runs the second-layer verifier based on outputs of the first layer.
 ```
 python grpo_verifier.py --model_to_check gptoss_120b --test_full --test_folder sledai-notes --n_run 1
 ``` 
@@ -67,6 +65,9 @@ python grpo.py --grpo_base_model qwen3_14b --use_gspo --drop_kl --reasoning_rewa
 
 ## Inference on custom data without ground truth
 You can also run the SLEDAI-2K scoring pipeline on your own clinical notes without ground truth labels (e.g. for simulated clinical implementation). This mode performs inference only (without evaluation). Please make sure the diagnostic criteria (for lab tests especially) align with your data.
+
+
+[**Prompt Customizer Web Interface**](https://reneeleung.github.io/sledai-llm) – To help you align the guidelines and criteria with your local settings, we provide an interactive web interface. You can select between *Outpatient* (assess at visit date) and *Inpatient* (assess at admission date) note types, edit each descriptor's diagnostic criteria, exclusions, and lab thresholds, and customize the global prompt template. The tool automatically generates the corresponding prompts in real-time, which you can copy directly or download as `prompt.py` to replace the default version in `sledai-llm/prompts/`. This ensures the inference pipeline uses criteria that match your institution's lab methods, reference ranges, and clinical practices.
 
 Place your clinical notes (.txt) in a folder under `data/`, e.g. `data/sample/`. Then run inference as follows:
 ```
